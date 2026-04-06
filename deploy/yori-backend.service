@@ -1,0 +1,18 @@
+[Unit]
+Description=Yori Backend API
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/yori/backend
+Environment=GO_ENV=prod
+ExecStart=/opt/yori/backend/server
+Restart=on-failure
+RestartSec=5
+
+# 安全加固
+NoNewPrivileges=true
+ReadWritePaths=/opt/yori/uploads /data
+
+[Install]
+WantedBy=multi-user.target

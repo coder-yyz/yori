@@ -1,0 +1,27 @@
+# ── OS ──
+.DS_Store
+Thumbs.db
+
+# ── IDE ──
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# ── Backend ──
+backend/*.db
+backend/*.db-shm
+backend/*.db-wal
+backend/server
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# ── Frontend ──
+frontend/node_modules/
+frontend/dist/
+frontend/.idea/
+
+# ── Env ──
+.env
+.env.*
+!.env.example

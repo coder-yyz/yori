@@ -1,0 +1,145 @@
+import type { DialogProps } from '@mui/material/Dialog';
+
+import { mutate } from 'swr';
+import { useState, useEffect, useCallback } from 'react';
+
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import TextField from '@mui/material/TextField';
+import IconButton from '@mui/material/IconButton';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+
+import { uploadFile } from 'src/actions/blog';
+
+import { Upload } from 'src/components/Upload';
+import { toast } from 'src/components/Snackbar';
+import { Iconify } from 'src/components/Iconify';
+
+// ----------------------------------------------------------------------
+
+type Props = DialogProps & {
+  title?: string;
+  folderName?: string;
+  onClose: () => void;
+  onCreate?: () => void;
+  onUpdate?: () => void;
+  onChangeFolderName?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+};
+
+export function FileManagerCreateFolderDialog({
+  open,
+  onClose,
+  onCreate,
+  onUpdate,
+  folderName,
+  onChangeFolderName,
+  title = 'Add files',
+  ...other
+}: Props) {
+  const [files, setFiles] = useState<(File | string)[]>([]);
+
+  useEffect(() => {
+    if (!open) {
+      setFiles([]);
+    }
+  }, [open]);
+
+  const handleDrop = useCallback(
+    (acceptedFiles: File[]) => {
+      setFiles([...files, ...acceptedFiles]);
+    },
+    [files]
+  );
+
+  const [uploading, setUploading] = useState(false);
+
+  const handleUpload = async () => {
+    if (!files.length) return;
+    setUploading(true);
+    try {
+      const fileObjects = files.filter((f): f is File => f instanceof File);
+      await Promise.all(fileObjects.map((file) => uploadFile(file)));
+      await mutate(
+        (key: any) => {
+          const k = Array.isArray(key) ? key[0] : key;
+          return typeof k === 'string' && k.includes('/admin/uploads');
+        },
+        undefined,
+        { revalidate: true }
+      );
+      toast.success('Upload success!');
+      setFiles([]);
+      onClose();
+    } catch (error) {
+      console.error(error);
+      toast.error('Upload failed!');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleRemoveFile = (inputFile: File | string) => {
+    const filtered = files.filter((file) => file !== inputFile);
+    setFiles(filtered);
+  };
+
+  const handleRemoveAllFiles = () => {
+    setFiles([]);
+  };
+
+  return (
+    <Dialog fullWidth maxWidth="sm" open={open} aria-hidden={!open} onClose={onClose} {...other}>
+      <DialogTitle sx={[(theme) => ({ p: theme.spacing(3, 3, 2, 3) })]}>{title}</DialogTitle>
+
+      <IconButton
+        aria-label="Close"
+        onClick={onClose}
+        sx={{ top: 8, right: 8, position: 'absolute' }}
+      >
+        <Iconify icon="mingcute:close-line" />
+      </IconButton>
+
+      <DialogContent dividers sx={{ pt: 1, pb: 0, border: 'none' }}>
+        {(onCreate || onUpdate) && (
+          <TextField
+            fullWidth
+            label="Folder name"
+            value={folderName}
+            onChange={onChangeFolderName}
+            sx={{ mb: 3 }}
+          />
+        )}
+
+        <Upload multiple value={files} onDrop={handleDrop} onRemove={handleRemoveFile} />
+      </DialogContent>
+
+      <DialogActions>
+        <Button
+          variant="contained"
+          startIcon={<Iconify icon="eva:cloud-upload-fill" />}
+          onClick={handleUpload}
+          disabled={uploading || !files.length}
+        >
+          {uploading ? 'Uploading...' : 'Upload'}
+        </Button>
+
+        {!!files.length && (
+          <Button variant="outlined" color="inherit" onClick={handleRemoveAllFiles}>
+            Remove all
+          </Button>
+        )}
+
+        {(onCreate || onUpdate) && (
+          <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'flex-end' }}>
+            <Button variant="soft" onClick={onCreate || onUpdate}>
+              {onUpdate ? 'Save' : 'Create'}
+            </Button>
+          </Box>
+        )}
+      </DialogActions>
+    </Dialog>
+  );
+}

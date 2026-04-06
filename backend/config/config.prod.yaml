@@ -1,0 +1,10 @@
+server:
+  port: "8080"
+  mode: "release"
+
+database:
+  dsn: "/data/prod.db"
+
+jwt:
+  secret: "prod-secret-abcdef"
+  expire: 12

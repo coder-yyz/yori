@@ -1,0 +1,152 @@
+name: Build & Deploy
+
+on:
+  push:
+    branches: [main]
+
+# 同一时间只允许一个部署任务运行，新的会取消排队中的旧任务
+concurrency:
+  group: deploy
+  cancel-in-progress: true
+
+jobs:
+  # ────────────────────────────────────────────
+  # 1. 构建前端
+  # ────────────────────────────────────────────
+  build-frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build
+        run: yarn build
+
+      - name: Upload frontend artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: frontend/dist
+          retention-days: 1
+
+  # ────────────────────────────────────────────
+  # 2. 构建后端
+  # ────────────────────────────────────────────
+  build-backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.23"
+
+      - name: Install CGO dependencies (SQLite)
+        run: sudo apt-get update && sudo apt-get install -y gcc libc6-dev
+
+      - name: Build binary
+        env:
+          CGO_ENABLED: "1"
+          GOOS: linux
+          GOARCH: amd64
+        run: go build -o server ./cmd/server
+
+      - name: Upload backend artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-dist
+          path: |
+            backend/server
+            backend/config/config.prod.yaml
+          retention-days: 1
+
+  # ────────────────────────────────────────────
+  # 3. 部署到服务器
+  # ────────────────────────────────────────────
+  deploy:
+    needs: [build-frontend, build-backend]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (for deploy configs)
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: deploy
+
+      - name: Download frontend artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist
+          path: artifacts/frontend
+
+      - name: Download backend artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-dist
+          path: artifacts/backend
+
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy to server
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          SERVER_DOMAIN: ${{ secrets.SERVER_DOMAIN }}
+        run: |
+          SSH="ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${SERVER_USER}@${SERVER_HOST}"
+          SCP="scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no"
+          RSYNC="rsync -avz --delete -e 'ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no'"
+
+          # ── 1. 创建远程目录 ──
+          $SSH "sudo mkdir -p /opt/yori/backend/config /opt/yori/frontend /opt/yori/uploads /data"
+          $SSH "sudo chown -R ${SERVER_USER}:${SERVER_USER} /opt/yori /data"
+
+          # ── 2. 上传后端二进制 + 配置 ──
+          chmod +x artifacts/backend/server
+          $SCP artifacts/backend/server ${SERVER_USER}@${SERVER_HOST}:/opt/yori/backend/server
+          $SCP artifacts/backend/config/config.prod.yaml ${SERVER_USER}@${SERVER_HOST}:/opt/yori/backend/config/config.prod.yaml
+
+          # ── 3. 注入生产环境 JWT 密钥 ──
+          $SSH "sed -i 's|secret:.*|secret: \"${JWT_SECRET}\"|' /opt/yori/backend/config/config.prod.yaml"
+
+          # ── 4. 上传前端静态文件 ──
+          eval $RSYNC artifacts/frontend/ ${SERVER_USER}@${SERVER_HOST}:/opt/yori/frontend/
+
+          # ── 5. 安装 & 配置 systemd 服务 ──
+          $SCP deploy/yori-backend.service ${SERVER_USER}@${SERVER_HOST}:/tmp/yori-backend.service
+          $SSH "sudo mv /tmp/yori-backend.service /etc/systemd/system/yori-backend.service"
+          $SSH "sudo systemctl daemon-reload"
+          $SSH "sudo systemctl enable yori-backend"
+
+          # ── 6. 安装 & 配置 Nginx ──
+          $SSH "which nginx > /dev/null 2>&1 || (sudo apt-get update && sudo apt-get install -y nginx)"
+          $SCP deploy/nginx.conf ${SERVER_USER}@${SERVER_HOST}:/tmp/yori-nginx.conf
+          $SSH "sudo sed -i 's|your-domain.com|${SERVER_DOMAIN}|g' /tmp/yori-nginx.conf"
+          $SSH "sudo mv /tmp/yori-nginx.conf /etc/nginx/sites-available/yori"
+          $SSH "sudo ln -sf /etc/nginx/sites-available/yori /etc/nginx/sites-enabled/yori"
+          $SSH "sudo rm -f /etc/nginx/sites-enabled/default"
+          $SSH "sudo nginx -t && sudo systemctl reload nginx"
+
+          # ── 7. 重启后端服务 ──
+          $SSH "sudo systemctl restart yori-backend"
+
+          echo "✅ Deploy complete!"
