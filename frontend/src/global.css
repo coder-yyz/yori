@@ -20,16 +20,16 @@
 * Plugins
 *************************************** */
 /* scrollbar */
-@import './components/scrollbar/styles.css';
+@import './components/Scrollbar/styles.css';
 
 /* map */
-@import './components/map/styles.css';
+@import './components/Map/styles.css';
 
 /* lightbox */
-@import './components/lightbox/styles.css';
+@import './components/Lightbox/styles.css';
 
 /* chart */
-@import './components/chart/styles.css';
+@import './components/Chart/styles.css';
 
 /** **************************************
 * Baseline
