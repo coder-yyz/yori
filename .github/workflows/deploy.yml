@@ -120,7 +120,7 @@ jobs:
           RSYNC="rsync -avz --delete -e 'ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no'"
 
           # ── 1. 创建远程目录 ──
-          $SSH "sudo mkdir -p /opt/yori/backend/config /opt/yori/frontend /opt/yori/uploads /data"
+          $SSH "sudo mkdir -p /opt/yori/backend/config /opt/yori/backend/uploads /opt/yori/frontend /data"
           $SSH "sudo chown -R ${SERVER_USER}:${SERVER_USER} /opt/yori /data"
 
           # ── 2. 停止后端服务 & 上传二进制 + 配置 ──

@@ -12,7 +12,7 @@ RestartSec=5
 
 # 安全加固
 NoNewPrivileges=true
-ReadWritePaths=/opt/yori/uploads /data
+ReadWritePaths=/opt/yori/backend/uploads /data
 
 [Install]
 WantedBy=multi-user.target
