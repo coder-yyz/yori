@@ -31,6 +31,13 @@ export default defineConfig({
       },
     ],
   },
-  server: { port: PORT, host: true },
+  server: {
+    port: PORT,
+    host: true,
+    proxy: {
+      '/api': 'http://localhost:2000',
+      '/uploads': 'http://localhost:2000',
+    },
+  },
   preview: { port: PORT, host: true },
 });

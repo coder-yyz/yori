@@ -122,13 +122,30 @@ func UploadFile(userID uint, userUUID string, fh *multipart.FileHeader) (*model.
 }
 
 // ListMyUploads 查询当前用户的上传记录
+// normalizeUploadURLs 将旧的绝对 URL 统一转为相对路径
+func normalizeUploadURLs(list []model.Upload) {
+	for i := range list {
+		if idx := strings.Index(list[i].URL, "/uploads/"); idx > 0 {
+			list[i].URL = list[i].URL[idx:]
+		}
+	}
+}
+
 func ListMyUploads(userID uint, page, pageSize int) ([]model.Upload, int64, error) {
-	return repository.ListUploadsByUser(userID, page, pageSize)
+	list, total, err := repository.ListUploadsByUser(userID, page, pageSize)
+	if err == nil {
+		normalizeUploadURLs(list)
+	}
+	return list, total, err
 }
 
 // ListAllUploads 管理员查询所有上传记录
 func ListAllUploads(page, pageSize int) ([]model.Upload, int64, error) {
-	return repository.ListAllUploads(page, pageSize)
+	list, total, err := repository.ListAllUploads(page, pageSize)
+	if err == nil {
+		normalizeUploadURLs(list)
+	}
+	return list, total, err
 }
 
 // DeleteUpload 删除上传记录（同时删除文件）
