@@ -45,6 +45,14 @@ func RegisterRoutes(r *gin.Engine) {
 			tags.GET("/all", listAllTagsHandler)
 			tags.GET("/detail/:id", getTag)
 		}
+
+		// 照片墙（公开只读）
+		photos := public.Group("/photo")
+		{
+			photos.GET("/list", listPublicPhotos)
+			photos.GET("/all", listAllPublicPhotos)
+			photos.GET("/tags", listPublicPhotoTags)
+		}
 	}
 
 	// ========= 需要登录（任意角色）=========
@@ -140,6 +148,25 @@ func RegisterRoutes(r *gin.Engine) {
 		{
 			adminUploads.GET("", adminListAllUploads)
 			adminUploads.DELETE("/:id", deleteUpload)
+		}
+
+		// 照片墙管理
+		adminPhotos := adminGroup.Group("/photos")
+		{
+			adminPhotos.GET("", adminListPhotos)
+			adminPhotos.POST("", adminUploadPhoto)
+			adminPhotos.PUT("/:id", adminUpdatePhoto)
+			adminPhotos.DELETE("/:id", adminDeletePhoto)
+		}
+
+		// 照片标签管理
+		adminPhotoTags := adminGroup.Group("/photo-tags")
+		{
+			adminPhotoTags.GET("", adminListPhotoTags)
+			adminPhotoTags.GET("/:id", adminGetPhotoTag)
+			adminPhotoTags.POST("", adminCreatePhotoTag)
+			adminPhotoTags.PUT("/:id", adminUpdatePhotoTag)
+			adminPhotoTags.DELETE("/:id", adminDeletePhotoTag)
 		}
 	}
 }

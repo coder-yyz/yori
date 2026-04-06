@@ -28,6 +28,10 @@ export const paths = {
       categories: `${ROOTS.ADMIN}/blog/categories`,
     },
     fileManager: `${ROOTS.ADMIN}/file-manager`,
+    photo: {
+      root: `${ROOTS.ADMIN}/photo`,
+      tags: `${ROOTS.ADMIN}/photo/tags`,
+    },
   },
   blog: {
     root: '/blog',
@@ -37,6 +41,7 @@ export const paths = {
   },
 
   comingSoon: '/coming-soon',
+  photoWall: '/photo-wall',
   about: '/about-us',
   faqs: '/faqs',
   docs: '/docs',

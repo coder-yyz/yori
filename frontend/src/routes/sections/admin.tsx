@@ -35,6 +35,9 @@ const BlogTagsPage = lazy(() => import('src/pages/Admin/Blog/Tags'));
 const BlogCategoriesPage = lazy(() => import('src/pages/Admin/Blog/Categories'));
 // File manager
 const FileManagerPage = lazy(() => import('src/pages/Admin/FileManager'));
+// Photo
+const PhotoListPage = lazy(() => import('src/pages/Admin/Photo/List'));
+const PhotoTagsPage = lazy(() => import('src/pages/Admin/Photo/Tags'));
 
 // ----------------------------------------------------------------------
 
@@ -164,6 +167,27 @@ export const adminRoutes: RouteObject[] = [
             <FileManagerPage />
           </AdminOnly>
         ),
+      },
+      {
+        path: 'photo',
+        children: [
+          {
+            index: true,
+            element: (
+              <AdminOnly>
+                <PhotoListPage />
+              </AdminOnly>
+            ),
+          },
+          {
+            path: 'tags',
+            element: (
+              <AdminOnly>
+                <PhotoTagsPage />
+              </AdminOnly>
+            ),
+          },
+        ],
       },
     ],
   },

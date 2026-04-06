@@ -121,6 +121,23 @@ export const endpoints = {
     list: '/api/admin/uploads',
     delete: '/api/admin/uploads',
   },
+  photo: {
+    list: '/api/photo/list',
+    all: '/api/photo/all',
+    tags: '/api/photo/tags',
+  },
+  adminPhoto: {
+    list: '/api/admin/photos',
+    upload: '/api/admin/photos',
+    update: '/api/admin/photos',
+    delete: '/api/admin/photos',
+  },
+  adminPhotoTag: {
+    list: '/api/admin/photo-tags',
+    create: '/api/admin/photo-tags',
+    update: '/api/admin/photo-tags',
+    delete: '/api/admin/photo-tags',
+  },
   me: {
     root: '/api/me',
     password: '/api/me/password',

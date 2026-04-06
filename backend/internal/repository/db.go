@@ -42,6 +42,9 @@ func InitDB() {
 		&model.Favorite{},
 		&model.BlogShare{},
 		&model.Upload{},
+		&model.Photo{},
+		&model.PhotoTag{},
+		&model.PhotoTagLink{},
 	); err != nil {
 		log.Fatal("数据库迁移失败:", err)
 	}

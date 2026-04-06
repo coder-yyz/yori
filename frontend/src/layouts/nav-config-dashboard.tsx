@@ -109,6 +109,16 @@ export const navData: NavSectionProps['data'] = [
         icon: ICONS.folder,
         allowedRoles: ['root', 'admin'],
       },
+      {
+        title: 'Photo',
+        path: paths.admin.photo.root,
+        icon: icon('ic-blog'),
+        allowedRoles: ['root', 'admin'],
+        children: [
+          { title: 'List', path: paths.admin.photo.root },
+          { title: 'Tags', path: paths.admin.photo.tags },
+        ],
+      },
     ],
   },
 ];

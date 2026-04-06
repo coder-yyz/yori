@@ -25,6 +25,7 @@ const BlankPage = lazy(() => import('src/pages/Blank'));
 // ----------------------------------------------------------------------
 const AboutPage = lazy(() => import('src/pages/AboutMe'));
 const ComingSoonPage = lazy(() => import('src/pages/ComingSoon'));
+const PhotoWallPage = lazy(() => import('src/pages/PhotoWall'));
 // ----------------------------------------------------------------------
 
 export const mainRoutes: RouteObject[] = [
@@ -45,6 +46,7 @@ export const mainRoutes: RouteObject[] = [
           { path: 'about-us', element: <AboutPage /> },
           { path: 'blank', element: <BlankPage /> },
           { path: 'coming-soon', element: <ComingSoonPage /> },
+          { path: 'photo-wall', element: <PhotoWallPage /> },
           {
             path: 'blog',
             children: [

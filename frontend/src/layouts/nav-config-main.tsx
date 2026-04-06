@@ -16,6 +16,11 @@ export const navData: NavMainProps['data'] = [
     path: paths.blog.timeline,
   },
   {
+    title: 'Photo Wall',
+    icon: <Iconify width={22} icon="solar:file-bold-duotone" />,
+    path: paths.photoWall,
+  },
+  {
     title: 'Others',
     icon: <Iconify width={22} icon="solar:notebook-bold-duotone" />,
     path: paths.comingSoon,
