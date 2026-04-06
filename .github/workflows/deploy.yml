@@ -130,7 +130,7 @@ jobs:
           $SSH "sed -i 's|secret:.*|secret: \"${JWT_SECRET}\"|' /opt/yori/backend/config/config.prod.yaml"
 
           # ── 4. 上传前端静态文件 ──
-          $SSH "which rsync > /dev/null 2>&1 || (sudo apt-get update && sudo apt-get install -y rsync)"
+          $SSH "which rsync > /dev/null 2>&1 || sudo yum install -y rsync"
           eval $RSYNC artifacts/frontend/ ${SERVER_USER}@${SERVER_HOST}:/opt/yori/frontend/
 
           # ── 5. 安装 & 配置 systemd 服务 ──
@@ -140,12 +140,10 @@ jobs:
           $SSH "sudo systemctl enable yori-backend"
 
           # ── 6. 安装 & 配置 Nginx ──
-          $SSH "which nginx > /dev/null 2>&1 || (sudo apt-get update && sudo apt-get install -y nginx)"
+          $SSH "which nginx > /dev/null 2>&1 || sudo yum install -y nginx"
           $SCP deploy/nginx.conf ${SERVER_USER}@${SERVER_HOST}:/tmp/yori-nginx.conf
           $SSH "sudo sed -i 's|your-domain.com|${SERVER_DOMAIN}|g' /tmp/yori-nginx.conf"
-          $SSH "sudo mv /tmp/yori-nginx.conf /etc/nginx/sites-available/yori"
-          $SSH "sudo ln -sf /etc/nginx/sites-available/yori /etc/nginx/sites-enabled/yori"
-          $SSH "sudo rm -f /etc/nginx/sites-enabled/default"
+          $SSH "sudo mv /tmp/yori-nginx.conf /etc/nginx/conf.d/yori.conf"
           $SSH "sudo nginx -t && sudo systemctl reload nginx"
 
           # ── 7. 重启后端服务 ──

@@ -2,15 +2,15 @@ import 'src/global.css';
 
 import { useEffect } from 'react';
 
-import { AuthProvider as JwtAuthProvider } from 'src/auth/context/jwt';
-import { MotionLazy } from 'src/components/Animate/motion-lazy';
-import { ProgressBar } from 'src/components/ProgressBar';
-import { SettingsDrawer, defaultSettings, SettingsProvider } from 'src/components/Settings';
+import { usePathname } from 'src/routes/hooks';
 import { Snackbar } from 'src/components/Snackbar';
 import { LocalizationProvider } from 'src/locales';
-import { I18nProvider } from 'src/locales/i18n-provider';
-import { usePathname } from 'src/routes/hooks';
 import { themeConfig, ThemeProvider } from 'src/theme';
+import { ProgressBar } from 'src/components/ProgressBar';
+import { I18nProvider } from 'src/locales/i18n-provider';
+import { MotionLazy } from 'src/components/Animate/motion-lazy';
+import { AuthProvider as JwtAuthProvider } from 'src/auth/context/jwt';
+import { SettingsDrawer, defaultSettings, SettingsProvider } from 'src/components/Settings';
 
 // ----------------------------------------------------------------------
 
