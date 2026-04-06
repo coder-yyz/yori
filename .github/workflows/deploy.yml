@@ -123,7 +123,8 @@ jobs:
           $SSH "sudo mkdir -p /opt/yori/backend/config /opt/yori/frontend /opt/yori/uploads /data"
           $SSH "sudo chown -R ${SERVER_USER}:${SERVER_USER} /opt/yori /data"
 
-          # ── 2. 上传后端二进制 + 配置 ──
+          # ── 2. 停止后端服务 & 上传二进制 + 配置 ──
+          $SSH "sudo systemctl stop yori-backend || true"
           chmod +x artifacts/backend/server
           $SCP artifacts/backend/server ${SERVER_USER}@${SERVER_HOST}:/opt/yori/backend/server
           $SCP artifacts/backend/config/config.prod.yaml ${SERVER_USER}@${SERVER_HOST}:/opt/yori/backend/config/config.prod.yaml
