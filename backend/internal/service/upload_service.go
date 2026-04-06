@@ -8,7 +8,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"backend/config"
 	"backend/internal/model"
 	"backend/internal/repository"
 )
@@ -102,12 +101,8 @@ func UploadFile(userID uint, userUUID string, fh *multipart.FileHeader) (*model.
 		return nil, errors.New("保存文件失败")
 	}
 
-	// 生成可访问 URL
-	baseURL := config.Conf.Server.BaseURL
-	if baseURL == "" {
-		baseURL = "http://localhost:" + config.Conf.Server.Port
-	}
-	url := fmt.Sprintf("%s/uploads/%s", baseURL, storeName)
+	// 生成可访问 URL（使用相对路径，由前端/Nginx 拼接域名）
+	url := fmt.Sprintf("/uploads/%s", storeName)
 
 	record := &model.Upload{
 		UserID:    userID,
