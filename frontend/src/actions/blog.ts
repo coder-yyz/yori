@@ -1,8 +1,7 @@
-import type { SWRConfiguration } from 'swr';
 import type { Tag, Comment, BlogItem, Category } from 'src/types/blog';
 
 import { useMemo } from 'react';
-import useSWR, { mutate } from 'swr';
+import useSWR, { mutate, type SWRConfiguration } from 'swr';
 
 import axios, { fetcher, endpoints } from 'src/lib/axios';
 

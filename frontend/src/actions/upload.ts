@@ -1,7 +1,5 @@
-import type { SWRConfiguration } from 'swr';
-
 import { useMemo } from 'react';
-import useSWR, { mutate } from 'swr';
+import useSWR, { mutate, type SWRConfiguration } from 'swr';
 
 import axios, { fetcher, endpoints } from 'src/lib/axios';
 

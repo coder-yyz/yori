@@ -2,18 +2,15 @@ import 'src/global.css';
 
 import { useEffect } from 'react';
 
-import { usePathname } from 'src/routes/hooks';
-
-import { LocalizationProvider } from 'src/locales';
-import { themeConfig, ThemeProvider } from 'src/theme';
-import { I18nProvider } from 'src/locales/i18n-provider';
-
-import { Snackbar } from 'src/components/Snackbar';
-import { ProgressBar } from 'src/components/ProgressBar';
-import { MotionLazy } from 'src/components/Animate/motion-lazy';
-import { SettingsDrawer, defaultSettings, SettingsProvider } from 'src/components/Settings';
-
 import { AuthProvider as JwtAuthProvider } from 'src/auth/context/jwt';
+import { MotionLazy } from 'src/components/Animate/motion-lazy';
+import { ProgressBar } from 'src/components/ProgressBar';
+import { SettingsDrawer, defaultSettings, SettingsProvider } from 'src/components/Settings';
+import { Snackbar } from 'src/components/Snackbar';
+import { LocalizationProvider } from 'src/locales';
+import { I18nProvider } from 'src/locales/i18n-provider';
+import { usePathname } from 'src/routes/hooks';
+import { themeConfig, ThemeProvider } from 'src/theme';
 
 // ----------------------------------------------------------------------
 
