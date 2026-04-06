@@ -140,11 +140,11 @@ jobs:
           $SSH "sudo systemctl enable yori-backend"
 
           # ── 6. 安装 & 配置 Nginx ──
-          $SSH "which nginx > /dev/null 2>&1 || sudo yum install -y nginx"
+          $SSH "which nginx > /dev/null 2>&1 || (sudo yum install -y nginx && sudo systemctl enable nginx)"
           $SCP deploy/nginx.conf ${SERVER_USER}@${SERVER_HOST}:/tmp/yori-nginx.conf
           $SSH "sudo sed -i 's|your-domain.com|${SERVER_DOMAIN}|g' /tmp/yori-nginx.conf"
           $SSH "sudo mv /tmp/yori-nginx.conf /etc/nginx/conf.d/yori.conf"
-          $SSH "sudo nginx -t && sudo systemctl reload nginx"
+          $SSH "sudo nginx -t && sudo systemctl restart nginx"
 
           # ── 7. 重启后端服务 ──
           $SSH "sudo systemctl restart yori-backend"
