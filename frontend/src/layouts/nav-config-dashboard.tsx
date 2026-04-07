@@ -63,7 +63,15 @@ export const navData: NavSectionProps['data'] = [
    */
   {
     subheader: 'Overview',
-    items: [{ title: 'Home', path: paths.admin.home, icon: ICONS.dashboard }],
+    items: [
+      { title: 'Home', path: paths.admin.home, icon: ICONS.dashboard },
+      {
+        title: 'Analytics',
+        path: paths.admin.analytics,
+        icon: ICONS.analytics,
+        allowedRoles: ['root', 'admin'],
+      },
+    ],
   },
   /**
    * Management

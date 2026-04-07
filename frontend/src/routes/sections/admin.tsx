@@ -38,6 +38,8 @@ const FileManagerPage = lazy(() => import('src/pages/Admin/FileManager'));
 // Photo
 const PhotoListPage = lazy(() => import('src/pages/Admin/Photo/List'));
 const PhotoTagsPage = lazy(() => import('src/pages/Admin/Photo/Tags'));
+// Analytics
+const AnalyticsPage = lazy(() => import('src/pages/Admin/Analytics'));
 
 // ----------------------------------------------------------------------
 
@@ -188,6 +190,14 @@ export const adminRoutes: RouteObject[] = [
             ),
           },
         ],
+      },
+      {
+        path: 'analytics',
+        element: (
+          <AdminOnly>
+            <AnalyticsPage />
+          </AdminOnly>
+        ),
       },
     ],
   },

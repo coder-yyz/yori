@@ -138,6 +138,13 @@ export const endpoints = {
     update: '/api/admin/photo-tags',
     delete: '/api/admin/photo-tags',
   },
+  tracking: {
+    events: '/api/track/events',
+  },
+  adminAnalytics: {
+    overview: '/api/admin/analytics/overview',
+    events: '/api/admin/analytics/events',
+  },
   me: {
     root: '/api/me',
     password: '/api/me/password',

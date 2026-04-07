@@ -3,10 +3,12 @@ import 'src/global.css';
 import { useEffect } from 'react';
 
 import { usePathname } from 'src/routes/hooks';
+import { useAuthContext } from 'src/auth/hooks';
 import { Snackbar } from 'src/components/Snackbar';
 import { LocalizationProvider } from 'src/locales';
 import { themeConfig, ThemeProvider } from 'src/theme';
 import { ProgressBar } from 'src/components/ProgressBar';
+import { initTrackingSDK, setTrackingUserContext } from 'src/lib/tracking/sdk';
 import { I18nProvider } from 'src/locales/i18n-provider';
 import { MotionLazy } from 'src/components/Animate/motion-lazy';
 import { AuthProvider as JwtAuthProvider } from 'src/auth/context/jwt';
@@ -24,6 +26,7 @@ type AppProps = {
 
 export default function App({ children }: AppProps) {
   useScrollToTop();
+  useTrackingBootstrap();
 
   return (
     <I18nProvider>
@@ -35,6 +38,7 @@ export default function App({ children }: AppProps) {
               defaultMode={themeConfig.defaultMode}
             >
               <MotionLazy>
+                <TrackingAuthBridge />
                 <Snackbar />
                 <ProgressBar />
                 <SettingsDrawer defaultSettings={defaultSettings} />
@@ -56,6 +60,47 @@ function useScrollToTop() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [pathname]);
+
+  return null;
+}
+
+function useTrackingBootstrap() {
+  useEffect(() => {
+    initTrackingSDK();
+  }, []);
+
+  return null;
+}
+
+function TrackingAuthBridge() {
+  const { user } = useAuthContext();
+
+  useEffect(() => {
+    if (!user) {
+      setTrackingUserContext({
+        userId: '',
+        role: '',
+        isLoggedIn: false,
+        userInfo: {},
+      });
+      return;
+    }
+
+    const userId = String(user.id || user.uuid || user.userId || '').trim();
+    const role = String(user.role || '').trim();
+
+    setTrackingUserContext({
+      userId,
+      role,
+      isLoggedIn: true,
+      userInfo: {
+        id: userId,
+        role,
+        username: user.username,
+        email: user.email,
+      },
+    });
+  }, [user]);
 
   return null;
 }

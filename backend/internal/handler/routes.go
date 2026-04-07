@@ -53,6 +53,12 @@ func RegisterRoutes(r *gin.Engine) {
 			photos.GET("/all", listAllPublicPhotos)
 			photos.GET("/tags", listPublicPhotoTags)
 		}
+
+		// 埋点上报（公开）
+		track := public.Group("/track")
+		{
+			track.POST("/events", reportTrackEvents)
+		}
 	}
 
 	// ========= 需要登录（任意角色）=========
@@ -167,6 +173,13 @@ func RegisterRoutes(r *gin.Engine) {
 			adminPhotoTags.POST("", adminCreatePhotoTag)
 			adminPhotoTags.PUT("/:id", adminUpdatePhotoTag)
 			adminPhotoTags.DELETE("/:id", adminDeletePhotoTag)
+		}
+
+		// 埋点可视化（管理员）
+		analytics := adminGroup.Group("/analytics")
+		{
+			analytics.GET("/overview", adminAnalyticsOverview)
+			analytics.GET("/events", adminListTrackEvents)
 		}
 	}
 }
