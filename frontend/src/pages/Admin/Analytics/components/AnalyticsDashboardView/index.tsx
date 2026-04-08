@@ -72,6 +72,17 @@ function formatEventTypeName(eventType: string) {
   return eventType.charAt(0).toUpperCase() + eventType.slice(1);
 }
 
+function formatEventTypeLabel(eventType?: string) {
+  if (!eventType) return '全部';
+  const map: Record<string, string> = {
+    exposure: '曝光',
+    click: '点击',
+    error: '错误',
+    custom: '自定义',
+  };
+  return map[eventType] || eventType;
+}
+
 function parseJSON(value?: string) {
   if (!value) return null;
   try {
@@ -123,12 +134,20 @@ function buildFullEventPayload(event: EventRow) {
   };
 }
 
-function StatCard({ title, value }: { title: string; value: string | number }) {
+function StatCard({
+  title,
+  value,
+  trackKey,
+}: {
+  title: string;
+  value: string | number;
+  trackKey: string;
+}) {
   const isNumberValue = typeof value === 'number';
   return (
     <Card
       variant="outlined"
-      data-track-exposure={`analytics_card_${title.toLowerCase().replace(/\s+/g, '_')}`}
+      data-track-exposure={`analytics_card_${trackKey}`}
       sx={{ height: '100%' }}
     >
       <Stack sx={{ p: 3 }} spacing={1}>
@@ -181,7 +200,18 @@ export function AnalyticsDashboardView() {
       labels: { formatter: (value) => String(Math.round(value)) },
     },
     tooltip: {
-      y: { formatter: (value) => `${Math.round(value)} events` },
+      y: { formatter: (value) => `${Math.round(value)}` },
+    },
+    stroke: {
+      width: [3, 2, 2],
+      curve: 'smooth',
+    },
+    markers: {
+      size: [2, 0, 0],
+    },
+    legend: {
+      position: 'top',
+      horizontalAlign: 'left',
     },
   });
 
@@ -194,6 +224,53 @@ export function AnalyticsDashboardView() {
     () => overview?.typeCounts?.map((item) => item.count) || [],
     [overview?.typeCounts]
   );
+  const trafficByDate = useMemo(
+    () =>
+      new Map(
+        (overview?.dailyTraffic || []).map((item) => [
+          item.date,
+          { pv: item.pv || 0, uv: item.uv || 0 },
+        ])
+      ),
+    [overview?.dailyTraffic]
+  );
+
+  const trendSeries = useMemo(
+    () => [
+      {
+        name: '事件数',
+        data: overview?.dailyCounts?.map((item) => item.count) || [],
+      },
+      {
+        name: 'PV',
+        data:
+          overview?.dailyCounts?.map((item) => {
+            const traffic = trafficByDate.get(item.date);
+            return traffic?.pv || 0;
+          }) || [],
+      },
+      {
+        name: 'UV',
+        data:
+          overview?.dailyCounts?.map((item) => {
+            const traffic = trafficByDate.get(item.date);
+            return traffic?.uv || 0;
+          }) || [],
+      },
+    ],
+    [overview?.dailyCounts, trafficByDate]
+  );
+
+  const hasTrendData = trendSeries.some((series) => series.data.some((value) => value > 0));
+  const hasTypeData = typeSeries.some((value) => value > 0);
+  const hasActiveFilters = days !== 7 || Boolean(eventType);
+
+  const handleResetFilters = () => {
+    setDays(7);
+    setEventType('');
+    setPage(0);
+    setRowsPerPage(10);
+  };
 
   const handleCopy = async (actionKey: string, label: string, value: Record<string, unknown>) => {
     await copyJSON(label, value);
@@ -249,8 +326,8 @@ export function AnalyticsDashboardView() {
   return (
     <DashboardContent>
       <CustomBreadcrumbs
-        heading="Analytics Dashboard"
-        links={[{ name: 'Dashboard', href: paths.admin.home }, { name: 'Analytics' }]}
+        heading="数据分析"
+        links={[{ name: '后台', href: paths.admin.home }, { name: '数据分析' }]}
         sx={{ mb: { xs: 3, md: 5 } }}
       />
 
@@ -261,7 +338,7 @@ export function AnalyticsDashboardView() {
       ) : null}
 
       <Card variant="outlined" sx={{ p: 2, mb: 3 }}>
-        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems={{ sm: 'center' }}>
           <FormControl sx={{ minWidth: 160, width: { xs: '100%', sm: 'auto' } }}>
             <InputLabel id="analytics-days-label">统计周期</InputLabel>
             <Select
@@ -295,23 +372,74 @@ export function AnalyticsDashboardView() {
               <MenuItem value="custom">自定义</MenuItem>
             </Select>
           </FormControl>
+
+          <Stack
+            direction={{ xs: 'column', sm: 'row' }}
+            spacing={1}
+            sx={{ width: { xs: '100%', sm: 'auto' }, ml: { sm: 'auto' } }}
+          >
+            <Chip
+              size="small"
+              variant="outlined"
+              label={`周期: 最近 ${days} 天`}
+              sx={{ width: { xs: '100%', sm: 'auto' }, justifyContent: 'flex-start' }}
+            />
+            <Chip
+              size="small"
+              variant="outlined"
+              label={`事件: ${formatEventTypeLabel(eventType)}`}
+              sx={{ width: { xs: '100%', sm: 'auto' }, justifyContent: 'flex-start' }}
+            />
+            <Button
+              size="small"
+              variant="text"
+              disabled={!hasActiveFilters}
+              onClick={handleResetFilters}
+              data-track-click="analytics_reset_filters"
+              sx={{ width: { xs: '100%', sm: 'auto' } }}
+            >
+              重置筛选
+            </Button>
+          </Stack>
         </Stack>
       </Card>
 
       <Grid container spacing={3} sx={{ mb: 3 }}>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <StatCard title="Total Events" value={overview?.totalEvents || 0} />
+          <StatCard title="总事件数" value={overview?.totalEvents || 0} trackKey="total_events" />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <StatCard title="Top Page" value={overview?.topPages?.[0]?.pagePath || '-'} />
+          <StatCard title="PV" value={overview?.totalPv || 0} trackKey="total_pv" />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <StatCard title="Top Event" value={overview?.topEvents?.[0]?.eventName || '-'} />
+          <StatCard title="UV" value={overview?.totalUv || 0} trackKey="total_uv" />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <StatCard
-            title="Error Count"
+            title="PV/UV"
+            value={Number(overview?.pvPerUv || 0).toFixed(2)}
+            trackKey="pv_per_uv"
+          />
+        </Grid>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+          <StatCard
+            title="最高频页面"
+            value={overview?.topPages?.[0]?.pagePath || '-'}
+            trackKey="top_page"
+          />
+        </Grid>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+          <StatCard
+            title="最高频事件"
+            value={overview?.topEvents?.[0]?.eventName || '-'}
+            trackKey="top_event"
+          />
+        </Grid>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+          <StatCard
+            title="错误事件数"
             value={overview?.typeCounts?.find((v) => v.eventType === 'error')?.count || 0}
+            trackKey="error_count"
           />
         </Grid>
       </Grid>
@@ -320,20 +448,27 @@ export function AnalyticsDashboardView() {
         <Grid size={{ xs: 12, md: 8 }}>
           <Card variant="outlined" sx={{ p: 3 }} data-track-exposure="analytics_trend_chart">
             <Typography variant="h6" sx={{ mb: 2 }}>
-              Event Trend
+              事件趋势
             </Typography>
             <Box sx={{ height: { xs: 280, md: 320 } }}>
-              <Chart
-                type="line"
-                series={[
-                  {
-                    name: 'Events',
-                    data: overview?.dailyCounts?.map((item) => item.count) || [],
-                  },
-                ]}
-                options={trendOptions}
-                sx={{ height: { xs: 280, md: 320 } }}
-              />
+              {overviewLoading ? (
+                <Stack alignItems="center" justifyContent="center" sx={{ height: '100%' }}>
+                  <CircularProgress size={24} />
+                </Stack>
+              ) : hasTrendData ? (
+                <Chart
+                  type="line"
+                  series={trendSeries}
+                  options={trendOptions}
+                  sx={{ height: { xs: 280, md: 320 } }}
+                />
+              ) : (
+                <Stack alignItems="center" justifyContent="center" sx={{ height: '100%' }}>
+                  <Typography variant="body2" color="text.secondary">
+                    暂无趋势数据
+                  </Typography>
+                </Stack>
+              )}
             </Box>
           </Card>
         </Grid>
@@ -341,15 +476,27 @@ export function AnalyticsDashboardView() {
         <Grid size={{ xs: 12, md: 4 }}>
           <Card variant="outlined" sx={{ p: 3 }} data-track-exposure="analytics_type_chart">
             <Typography variant="h6" sx={{ mb: 2 }}>
-              Event Type Share
+              事件类型占比
             </Typography>
             <Box sx={{ height: { xs: 280, md: 320 } }}>
-              <Chart
-                type="donut"
-                series={typeSeries}
-                options={typeOptions}
-                sx={{ height: { xs: 280, md: 320 } }}
-              />
+              {overviewLoading ? (
+                <Stack alignItems="center" justifyContent="center" sx={{ height: '100%' }}>
+                  <CircularProgress size={24} />
+                </Stack>
+              ) : hasTypeData ? (
+                <Chart
+                  type="donut"
+                  series={typeSeries}
+                  options={typeOptions}
+                  sx={{ height: { xs: 280, md: 320 } }}
+                />
+              ) : (
+                <Stack alignItems="center" justifyContent="center" sx={{ height: '100%' }}>
+                  <Typography variant="body2" color="text.secondary">
+                    暂无类型占比数据
+                  </Typography>
+                </Stack>
+              )}
             </Box>
           </Card>
         </Grid>
@@ -359,9 +506,14 @@ export function AnalyticsDashboardView() {
         <Grid size={{ xs: 12, md: 6 }}>
           <Card variant="outlined" sx={{ p: 3, height: '100%' }}>
             <Typography variant="h6" sx={{ mb: 2 }}>
-              Top Pages
+              高频页面
             </Typography>
             <Stack spacing={1}>
+              {overviewLoading ? (
+                <Stack alignItems="center" justifyContent="center" sx={{ py: 3 }}>
+                  <CircularProgress size={20} />
+                </Stack>
+              ) : null}
               {(overview?.topPages || []).map((item, index) => (
                 <Stack
                   key={item.pagePath}
@@ -405,9 +557,14 @@ export function AnalyticsDashboardView() {
         <Grid size={{ xs: 12, md: 6 }}>
           <Card variant="outlined" sx={{ p: 3, height: '100%' }}>
             <Typography variant="h6" sx={{ mb: 2 }}>
-              Recent Errors
+              最近错误
             </Typography>
             <Stack spacing={1.25}>
+              {overviewLoading ? (
+                <Stack alignItems="center" justifyContent="center" sx={{ py: 3 }}>
+                  <CircularProgress size={20} />
+                </Stack>
+              ) : null}
               {(overview?.recentErrors || []).slice(0, 8).map((item) => (
                 <Stack
                   key={item.id}
@@ -446,7 +603,7 @@ export function AnalyticsDashboardView() {
           spacing={2}
           sx={{ px: 3, pt: 3 }}
         >
-          <Typography variant="h6">Event Logs</Typography>
+          <Typography variant="h6">事件日志</Typography>
           <Stack
             direction={{ xs: 'column', sm: 'row' }}
             spacing={1}
@@ -490,7 +647,7 @@ export function AnalyticsDashboardView() {
                 color="text.secondary"
                 sx={{ textAlign: 'center', py: 4 }}
               >
-                Loading...
+                加载中...
               </Typography>
             ) : events.length ? (
               events.map((item) => (
@@ -547,6 +704,7 @@ export function AnalyticsDashboardView() {
                         variant="outlined"
                         onClick={() => setSelectedEvent(item)}
                         data-track-click="analytics_open_event_detail"
+                        aria-label={`查看事件 ${item.eventName} 详情`}
                       >
                         详情
                       </Button>
@@ -570,21 +728,21 @@ export function AnalyticsDashboardView() {
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell>Type</TableCell>
-                    <TableCell>Name</TableCell>
-                    <TableCell>Page</TableCell>
-                    <TableCell>Location</TableCell>
-                    <TableCell>User</TableCell>
-                    <TableCell>Login</TableCell>
-                    <TableCell>Time</TableCell>
-                    <TableCell align="right">Action</TableCell>
+                    <TableCell>类型</TableCell>
+                    <TableCell>事件名</TableCell>
+                    <TableCell>页面</TableCell>
+                    <TableCell>地区</TableCell>
+                    <TableCell>用户</TableCell>
+                    <TableCell>登录状态</TableCell>
+                    <TableCell>时间</TableCell>
+                    <TableCell align="right">操作</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {eventsLoading ? (
                     <TableRow>
                       <TableCell colSpan={8} align="center" sx={{ py: 6 }}>
-                        Loading...
+                        加载中...
                       </TableCell>
                     </TableRow>
                   ) : events.length ? (
@@ -608,7 +766,7 @@ export function AnalyticsDashboardView() {
                         <TableCell>
                           <Chip
                             size="small"
-                            label={item.isLoggedIn ? 'Logged In' : 'Guest'}
+                            label={item.isLoggedIn ? '已登录' : '访客'}
                             color={item.isLoggedIn ? 'success' : 'default'}
                             variant={item.isLoggedIn ? 'filled' : 'outlined'}
                           />
@@ -622,6 +780,7 @@ export function AnalyticsDashboardView() {
                             variant="text"
                             onClick={() => setSelectedEvent(item)}
                             data-track-click="analytics_open_event_detail"
+                            aria-label={`查看事件 ${item.eventName} 详情`}
                           >
                             详情
                           </Button>
@@ -648,7 +807,7 @@ export function AnalyticsDashboardView() {
           onPageChange={(_, newPage) => setPage(newPage)}
           rowsPerPage={rowsPerPage}
           rowsPerPageOptions={[5, 10, 20, 50]}
-          labelRowsPerPage={isMobile ? '每页' : 'Rows per page'}
+          labelRowsPerPage="每页条数"
           labelDisplayedRows={({ from, to, count }) =>
             `${from}-${to} / ${count !== -1 ? count : `>${to}`}`
           }

@@ -7,6 +7,112 @@ import react from '@vitejs/plugin-react-swc';
 
 const PORT = 8080;
 
+function getPackageName(id: string) {
+  const normalizedId = id.replace(/\\/g, '/');
+  const parts = normalizedId.split('/node_modules/');
+  if (parts.length < 2) return null;
+
+  const packagePath = parts[1];
+  if (!packagePath) return null;
+
+  if (packagePath.startsWith('@')) {
+    const [scope, name] = packagePath.split('/');
+    if (!scope || !name) return null;
+    return `${scope}/${name}`;
+  }
+
+  const [name] = packagePath.split('/');
+  return name || null;
+}
+
+function getVendorChunk(id: string) {
+  if (!id.includes('node_modules')) return undefined;
+
+  if (id.includes('/react/') || id.includes('/react-dom/') || id.includes('/react-router/')) {
+    return 'vendor-react';
+  }
+
+  if (id.includes('/@mui/x-')) {
+    return 'vendor-mui-x';
+  }
+
+  if (
+    id.includes('/@mui/') ||
+    id.includes('/@emotion/') ||
+    id.includes('/stylis/') ||
+    id.includes('/@iconify/')
+  ) {
+    return 'vendor-ui';
+  }
+
+  if (id.includes('/apexcharts/') || id.includes('/react-apexcharts/')) {
+    return 'vendor-chart';
+  }
+
+  if (id.includes('/@tiptap/') || id.includes('/lowlight/') || id.includes('/turndown/')) {
+    return 'vendor-editor';
+  }
+
+  if (
+    id.includes('/react-hook-form/') ||
+    id.includes('/@hookform/resolvers/') ||
+    id.includes('/zod/')
+  ) {
+    return 'vendor-form';
+  }
+
+  if (id.includes('/i18next/') || id.includes('/react-i18next/')) {
+    return 'vendor-i18n';
+  }
+
+  if (id.includes('/maplibre-gl/') || id.includes('/react-map-gl/')) {
+    return 'vendor-map';
+  }
+
+  if (id.includes('/dayjs/') || id.includes('/axios/') || id.includes('/swr/')) {
+    return 'vendor-data';
+  }
+
+  if (id.includes('/firebase/') || id.includes('/aws-amplify/') || id.includes('/@supabase/')) {
+    return 'vendor-cloud';
+  }
+
+  if (
+    id.includes('/@firebase/') ||
+    id.includes('/@aws-') ||
+    id.includes('/@smithy/') ||
+    id.includes('/amazon-cognito-')
+  ) {
+    return 'vendor-cloud-sdk';
+  }
+
+  if (id.includes('/@fullcalendar/')) {
+    return 'vendor-calendar';
+  }
+
+  if (
+    id.includes('/embla-carousel') ||
+    id.includes('/yet-another-react-lightbox/') ||
+    id.includes('/react-dropzone/')
+  ) {
+    return 'vendor-media';
+  }
+
+  if (id.includes('/minimal-shared/') || id.includes('/nprogress/')) {
+    return 'vendor-core-utils';
+  }
+
+  const pkg = getPackageName(id);
+  if (!pkg) return 'vendor-misc';
+
+  if (pkg.startsWith('@atlaskit/')) return 'vendor-atlaskit';
+  if (pkg.startsWith('@react-pdf/')) return 'vendor-pdf';
+  if (pkg.startsWith('@auth0/')) return 'vendor-auth';
+  if (pkg === 'framer-motion') return 'vendor-motion';
+
+  return 'vendor-misc';
+}
+
 export default defineConfig({
   plugins: [
     react(),
@@ -40,4 +146,14 @@ export default defineConfig({
     },
   },
   preview: { port: PORT, host: true },
+  build: {
+    chunkSizeWarningLimit: 800,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          return getVendorChunk(id);
+        },
+      },
+    },
+  },
 });

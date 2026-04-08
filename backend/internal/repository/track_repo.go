@@ -15,6 +15,12 @@ type DailyCount struct {
 	Count int64  `json:"count"`
 }
 
+type DailyTrafficCount struct {
+	Date string `json:"date"`
+	PV   int64  `json:"pv"`
+	UV   int64  `json:"uv"`
+}
+
 type TopPage struct {
 	PagePath string `json:"pagePath"`
 	Count    int64  `json:"count"`
@@ -40,6 +46,27 @@ func CountTrackEvents(since time.Time) (int64, error) {
 	return total, err
 }
 
+func CountTrackPV(since time.Time) (int64, error) {
+	var total int64
+	err := DB.Model(&model.TrackEvent{}).
+		Where("occurred_at >= ?", since).
+		Where("event_type = ?", "exposure").
+		Where("page_path <> ''").
+		Count(&total).Error
+	return total, err
+}
+
+func CountTrackUV(since time.Time) (int64, error) {
+	var total int64
+	err := DB.Model(&model.TrackEvent{}).
+		Where("occurred_at >= ?", since).
+		Where("event_type = ?", "exposure").
+		Where("page_path <> ''").
+		Select("COUNT(DISTINCT COALESCE(NULLIF(user_uuid, ''), NULLIF(anonymous_id, ''), NULLIF(session_id, ''), NULLIF(ip, ''))) as count").
+		Scan(&total).Error
+	return total, err
+}
+
 func CountTrackEventsByType(since time.Time) ([]EventTypeCount, error) {
 	var rows []EventTypeCount
 	err := DB.Model(&model.TrackEvent{}).
@@ -56,6 +83,19 @@ func CountTrackEventsDaily(since time.Time) ([]DailyCount, error) {
 	err := DB.Model(&model.TrackEvent{}).
 		Select("DATE(occurred_at) as date, COUNT(*) as count").
 		Where("occurred_at >= ?", since).
+		Group("DATE(occurred_at)").
+		Order("date ASC").
+		Scan(&rows).Error
+	return rows, err
+}
+
+func CountTrackTrafficDaily(since time.Time) ([]DailyTrafficCount, error) {
+	var rows []DailyTrafficCount
+	err := DB.Model(&model.TrackEvent{}).
+		Select("DATE(occurred_at) as date, COUNT(*) as pv, COUNT(DISTINCT COALESCE(NULLIF(user_uuid, ''), NULLIF(anonymous_id, ''), NULLIF(session_id, ''), NULLIF(ip, ''))) as uv").
+		Where("occurred_at >= ?", since).
+		Where("event_type = ?", "exposure").
+		Where("page_path <> ''").
 		Group("DATE(occurred_at)").
 		Order("date ASC").
 		Scan(&rows).Error

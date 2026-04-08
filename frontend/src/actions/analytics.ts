@@ -21,6 +21,12 @@ type DailyCount = CountItem & {
   date: string;
 };
 
+type DailyTrafficCount = {
+  date: string;
+  pv: number;
+  uv: number;
+};
+
 type TopPage = CountItem & {
   pagePath: string;
 };
@@ -47,8 +53,12 @@ type ErrorEvent = {
 type AnalyticsOverview = {
   days: number;
   totalEvents: number;
+  totalPv: number;
+  totalUv: number;
+  pvPerUv: number;
   typeCounts: TypeCount[];
   dailyCounts: DailyCount[];
+  dailyTraffic: DailyTrafficCount[];
   topPages: TopPage[];
   topEvents: TopEvent[];
   recentErrors: ErrorEvent[];

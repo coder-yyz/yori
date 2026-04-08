@@ -43,8 +43,12 @@ type TrackEventPayload struct {
 type AnalyticsOverview struct {
 	Days         int                         `json:"days"`
 	TotalEvents  int64                       `json:"totalEvents"`
+	TotalPV      int64                       `json:"totalPv"`
+	TotalUV      int64                       `json:"totalUv"`
+	PVPerUV      float64                     `json:"pvPerUv"`
 	TypeCounts   []repository.EventTypeCount `json:"typeCounts"`
 	DailyCounts  []repository.DailyCount     `json:"dailyCounts"`
+	DailyTraffic []repository.DailyTrafficCount `json:"dailyTraffic"`
 	TopPages     []repository.TopPage        `json:"topPages"`
 	TopEvents    []repository.TopEvent       `json:"topEvents"`
 	RecentErrors []model.TrackEvent          `json:"recentErrors"`
@@ -196,12 +200,27 @@ func GetAnalyticsOverview(days int) (*AnalyticsOverview, error) {
 		return nil, err
 	}
 
+	totalPV, err := repository.CountTrackPV(since)
+	if err != nil {
+		return nil, err
+	}
+
+	totalUV, err := repository.CountTrackUV(since)
+	if err != nil {
+		return nil, err
+	}
+
 	typeCounts, err := repository.CountTrackEventsByType(since)
 	if err != nil {
 		return nil, err
 	}
 
 	dailyCounts, err := repository.CountTrackEventsDaily(since)
+	if err != nil {
+		return nil, err
+	}
+
+	dailyTraffic, err := repository.CountTrackTrafficDaily(since)
 	if err != nil {
 		return nil, err
 	}
@@ -221,11 +240,20 @@ func GetAnalyticsOverview(days int) (*AnalyticsOverview, error) {
 		return nil, err
 	}
 
+	pvPerUV := 0.0
+	if totalUV > 0 {
+		pvPerUV = float64(totalPV) / float64(totalUV)
+	}
+
 	return &AnalyticsOverview{
 		Days:         days,
 		TotalEvents:  total,
+		TotalPV:      totalPV,
+		TotalUV:      totalUV,
+		PVPerUV:      pvPerUV,
 		TypeCounts:   typeCounts,
 		DailyCounts:  dailyCounts,
+		DailyTraffic: dailyTraffic,
 		TopPages:     topPages,
 		TopEvents:    topEvents,
 		RecentErrors: recentErrors,
