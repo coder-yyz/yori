@@ -45,7 +45,14 @@ function getVendorChunk(id: string) {
     id.includes('/@mui/') ||
     id.includes('/@emotion/') ||
     id.includes('/stylis/') ||
-    id.includes('/@iconify/')
+    id.includes('/@iconify/') ||
+    id.includes('/clsx/') ||
+    id.includes('/prop-types/') ||
+    id.includes('/react-is/') ||
+    id.includes('/react-transition-group/') ||
+    id.includes('/node_modules/@popperjs/') ||
+    id.includes('/node_modules/@babel/runtime/') ||
+    id.includes('/hoist-non-react-statics/')
   ) {
     return 'vendor-ui';
   }
@@ -108,14 +115,14 @@ function getVendorChunk(id: string) {
   }
 
   const pkg = getPackageName(id);
-  if (!pkg) return 'vendor-misc';
+  if (!pkg) return undefined;
 
   if (pkg.startsWith('@atlaskit/')) return 'vendor-atlaskit';
   if (pkg.startsWith('@react-pdf/')) return 'vendor-pdf';
   if (pkg.startsWith('@auth0/')) return 'vendor-auth';
   if (pkg === 'framer-motion') return 'vendor-motion';
 
-  return 'vendor-misc';
+  return undefined;
 }
 
 export default defineConfig({
