@@ -28,7 +28,11 @@ function getPackageName(id: string) {
 function getVendorChunk(id: string) {
   if (!id.includes('node_modules')) return undefined;
 
-  if (id.includes('/react/') || id.includes('/react-dom/') || id.includes('/react-router/')) {
+  if (
+    id.includes('/node_modules/react/') ||
+    id.includes('/node_modules/react-dom/') ||
+    id.includes('/node_modules/react-router/')
+  ) {
     return 'vendor-react';
   }
 
