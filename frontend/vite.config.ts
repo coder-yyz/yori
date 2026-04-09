@@ -61,7 +61,11 @@ function getVendorChunk(id: string) {
     return 'vendor-chart';
   }
 
-  if (id.includes('/@tiptap/') || id.includes('/lowlight/') || id.includes('/turndown/')) {
+  if (id.includes('/lowlight/') || id.includes('/highlight.js/')) {
+    return 'vendor-highlight';
+  }
+
+  if (id.includes('/@tiptap/') || id.includes('/turndown/')) {
     return 'vendor-editor';
   }
 
@@ -159,6 +163,7 @@ export default defineConfig({
   },
   preview: { port: PORT, host: true },
   build: {
+    target: 'esnext',
     chunkSizeWarningLimit: 800,
     rollupOptions: {
       output: {
