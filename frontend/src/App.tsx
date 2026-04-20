@@ -1,6 +1,6 @@
 import 'src/global.css';
 
-import { useEffect } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 
 import { usePathname } from 'src/routes/hooks';
 import { useAuthContext } from 'src/auth/hooks';
@@ -12,7 +12,13 @@ import { initTrackingSDK, setTrackingUserContext } from 'src/lib/tracking/sdk';
 import { I18nProvider } from 'src/locales/i18n-provider';
 import { MotionLazy } from 'src/components/Animate/motion-lazy';
 import { AuthProvider as JwtAuthProvider } from 'src/auth/context/jwt';
-import { SettingsDrawer, defaultSettings, SettingsProvider } from 'src/components/Settings';
+import { defaultSettings, SettingsProvider } from 'src/components/Settings';
+
+const SettingsDrawer = lazy(() =>
+  import('src/components/Settings/drawer/settings-drawer').then((m) => ({
+    default: m.SettingsDrawer,
+  }))
+);
 
 // ----------------------------------------------------------------------
 
@@ -41,7 +47,9 @@ export default function App({ children }: AppProps) {
                 <TrackingAuthBridge />
                 <Snackbar />
                 <ProgressBar />
-                <SettingsDrawer defaultSettings={defaultSettings} />
+                <Suspense fallback={null}>
+                  <SettingsDrawer defaultSettings={defaultSettings} />
+                </Suspense>
                 {children}
               </MotionLazy>
             </ThemeProvider>
