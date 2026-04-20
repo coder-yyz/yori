@@ -1,6 +1,8 @@
 import type { AxiosRequestConfig } from 'axios';
+import type { Model } from 'transform-model';
 
 import axios from 'axios';
+import { createModel } from 'transform-model';
 
 import { CONFIG } from 'src/global-config';
 
@@ -51,6 +53,39 @@ export const fetcher = async <T = unknown>(
     console.error('Fetcher failed:', error);
     throw error;
   }
+};
+
+/**
+ * modelFetcher —— 在 fetcher 基础上，对 res.data.data 中的列表或单项
+ * 自动执行 createModel 映射，返回完整的 ApiResponse 结构（保留 code/msg 等字段）。
+ *
+ * 用法示例：
+ *   useSWR(url, (args) => modelFetcher(args, BlogItemModel))       // 单项
+ *   useSWR(url, (args) => modelFetcher(args, BlogItemModel, true)) // 列表分页
+ */
+export const modelFetcher = async <M extends Model, T = unknown>(
+  args: string | [string, AxiosRequestConfig],
+  ModelClass: new (data: any) => M,
+  /** 是否为分页列表结构（data.list + data.total ...） */
+  isList = false
+): Promise<T> => {
+  const raw = await fetcher<any>(args);
+
+  if (!raw?.data) return raw as T;
+
+  try {
+    if (isList && Array.isArray(raw.data?.list)) {
+      raw.data.list = createModel(ModelClass, raw.data.list);
+    } else if (!isList && raw.data && !Array.isArray(raw.data)) {
+      raw.data = createModel(ModelClass, raw.data);
+    } else if (!isList && Array.isArray(raw.data)) {
+      raw.data = createModel(ModelClass, raw.data);
+    }
+  } catch (e) {
+    console.warn('[modelFetcher] Model mapping failed, returning raw data:', e);
+  }
+
+  return raw as T;
 };
 
 // ----------------------------------------------------------------------

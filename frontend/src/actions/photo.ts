@@ -3,7 +3,8 @@ import type { PhotoItem, PhotoTag } from 'src/types/photo';
 import { useMemo } from 'react';
 import useSWR, { mutate, type SWRConfiguration } from 'swr';
 
-import axios, { fetcher, endpoints } from 'src/lib/axios';
+import { PhotoItemModel, PhotoTagModel } from 'src/models';
+import axios, { fetcher, modelFetcher, endpoints } from 'src/lib/axios';
 
 // ----------------------------------------------------------------------
 
@@ -33,7 +34,11 @@ export function useGetPhotos(params?: { page?: number; pageSize?: number; tag?: 
 
   const url = `${endpoints.photo.list}?${queryParams.toString()}`;
 
-  const { data, isLoading, error, isValidating } = useSWR<PhotosData>(url, fetcher, swrOptions);
+  const { data, isLoading, error, isValidating } = useSWR<PhotosData>(
+    url,
+    (args) => modelFetcher(args, PhotoItemModel, true),
+    swrOptions
+  );
 
   return useMemo(
     () => ({
@@ -62,7 +67,11 @@ export function useGetAllPhotos(tag?: string) {
 
   const url = `${endpoints.photo.all}?${queryParams.toString()}`;
 
-  const { data, isLoading, error } = useSWR<AllPhotosData>(url, fetcher, swrOptions);
+  const { data, isLoading, error } = useSWR<AllPhotosData>(
+    url,
+    (args) => modelFetcher(args, PhotoItemModel, true),
+    swrOptions
+  );
 
   return useMemo(
     () => ({
@@ -84,7 +93,7 @@ type PhotoTagsData = {
 export function useGetPhotoTags() {
   const { data, isLoading, error } = useSWR<PhotoTagsData>(
     endpoints.photo.tags,
-    fetcher,
+    (args) => modelFetcher(args, PhotoTagModel),
     swrOptions
   );
 
@@ -120,7 +129,7 @@ export function useGetAdminPhotos(params?: { page?: number; pageSize?: number; t
 
   const { data, isLoading, error, isValidating } = useSWR<AdminPhotosData>(
     url,
-    fetcher,
+    (args) => modelFetcher(args, PhotoItemModel, true),
     swrOptions
   );
 
@@ -187,7 +196,7 @@ export function useGetAdminPhotoTags(params?: {
 
   const { data, isLoading, error, isValidating } = useSWR<AdminPhotoTagsData>(
     url,
-    fetcher,
+    (args) => modelFetcher(args, PhotoTagModel, true),
     swrOptions
   );
 

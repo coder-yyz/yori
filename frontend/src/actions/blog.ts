@@ -3,7 +3,8 @@ import type { Tag, Comment, BlogItem, Category } from 'src/types/blog';
 import { useMemo } from 'react';
 import useSWR, { mutate, type SWRConfiguration } from 'swr';
 
-import axios, { fetcher, endpoints } from 'src/lib/axios';
+import { BlogItemModel, TagModel, CategoryModel, CommentModel } from 'src/models';
+import axios, { fetcher, modelFetcher, endpoints } from 'src/lib/axios';
 
 // ----------------------------------------------------------------------
 
@@ -32,9 +33,11 @@ export function useGetBlogs(params?: { page?: number; pageSize?: number }) {
 
   const url = `${endpoints.blog.list}?${queryParams.toString()}`;
 
-  const { data, isLoading, error, isValidating } = useSWR<BlogsData>(url, fetcher, {
-    ...swrOptions,
-  });
+  const { data, isLoading, error, isValidating } = useSWR<BlogsData>(
+    url,
+    (args) => modelFetcher(args, BlogItemModel, true),
+    { ...swrOptions }
+  );
 
   return useMemo(
     () => ({
@@ -71,9 +74,11 @@ export function useGetAdminBlogs(
 
   const url = params ? `${endpoints.adminBlog.list}?${queryParams.toString()}` : null;
 
-  const { data, isLoading, error, isValidating } = useSWR<AdminBlogsData>(url, fetcher, {
-    ...swrOptions,
-  });
+  const { data, isLoading, error, isValidating } = useSWR<AdminBlogsData>(
+    url,
+    (args) => modelFetcher(args, BlogItemModel, true),
+    { ...swrOptions }
+  );
 
   return useMemo(
     () => ({
@@ -100,9 +105,11 @@ export function useGetMyBlogs(
 
   const url = params ? `${endpoints.auth.me}/blogs?${queryParams.toString()}` : null;
 
-  const { data, isLoading, error, isValidating } = useSWR<AdminBlogsData>(url, fetcher, {
-    ...swrOptions,
-  });
+  const { data, isLoading, error, isValidating } = useSWR<AdminBlogsData>(
+    url,
+    (args) => modelFetcher(args, BlogItemModel, true),
+    { ...swrOptions }
+  );
 
   return useMemo(
     () => ({
@@ -127,9 +134,11 @@ type BlogData = {
 export function useGetBlog(id: string) {
   const url = id ? `${endpoints.blog.details}/${id}` : '';
 
-  const { data, isLoading, error, isValidating } = useSWR<BlogData>(url, fetcher, {
-    ...swrOptions,
-  });
+  const { data, isLoading, error, isValidating } = useSWR<BlogData>(
+    url,
+    (args) => modelFetcher(args, BlogItemModel),
+    { ...swrOptions }
+  );
 
   return useMemo(
     () => ({
@@ -147,9 +156,11 @@ export function useGetBlog(id: string) {
 export function useGetAdminBlog(id: string) {
   const url = id ? `${endpoints.adminBlog.details}/${id}` : '';
 
-  const { data, isLoading, error, isValidating } = useSWR<BlogData>(url, fetcher, {
-    ...swrOptions,
-  });
+  const { data, isLoading, error, isValidating } = useSWR<BlogData>(
+    url,
+    (args) => modelFetcher(args, BlogItemModel),
+    { ...swrOptions }
+  );
 
   return useMemo(
     () => ({
@@ -172,9 +183,11 @@ type LatestBlogsData = {
 export function useGetLatestBlogs(title: string) {
   const url = title ? [endpoints.blog.latest, { params: { title } }] : '';
 
-  const { data, isLoading, error, isValidating } = useSWR<LatestBlogsData>(url, fetcher, {
-    ...swrOptions,
-  });
+  const { data, isLoading, error, isValidating } = useSWR<LatestBlogsData>(
+    url,
+    (args) => modelFetcher(args, BlogItemModel),
+    { ...swrOptions }
+  );
 
   return useMemo(() => {
     const latestBlogs = data?.data || [];
@@ -228,7 +241,11 @@ type TagsData = {
 export function useGetAllTags() {
   const url = endpoints.tag.all;
 
-  const { data, isLoading, error } = useSWR<TagsData>(url, fetcher, swrOptions);
+  const { data, isLoading, error } = useSWR<TagsData>(
+    url,
+    (args) => modelFetcher(args, TagModel),
+    swrOptions
+  );
 
   return useMemo(
     () => ({
@@ -260,7 +277,11 @@ export function useGetTags(params?: { page?: number; pageSize?: number; search?:
 
   const url = `${endpoints.tag.list}?${queryParams.toString()}`;
 
-  const { data, isLoading, error, isValidating } = useSWR<TagListData>(url, fetcher, swrOptions);
+  const { data, isLoading, error, isValidating } = useSWR<TagListData>(
+    url,
+    (args) => modelFetcher(args, TagModel, true),
+    swrOptions
+  );
 
   return useMemo(
     () => ({
@@ -284,7 +305,11 @@ type CategoriesData = {
 export function useGetAllCategories() {
   const url = endpoints.category.all;
 
-  const { data, isLoading, error } = useSWR<CategoriesData>(url, fetcher, swrOptions);
+  const { data, isLoading, error } = useSWR<CategoriesData>(
+    url,
+    (args) => modelFetcher(args, CategoryModel),
+    swrOptions
+  );
 
   return useMemo(
     () => ({
@@ -317,7 +342,7 @@ export function useGetCategories(params?: { page?: number; pageSize?: number }) 
 
   const { data, isLoading, error, isValidating } = useSWR<CategoryListData>(
     url,
-    fetcher,
+    (args) => modelFetcher(args, CategoryModel, true),
     swrOptions
   );
 
@@ -501,7 +526,7 @@ export function useGetComments(blogId: string, params?: { page?: number; pageSiz
     ? `${endpoints.blog.details}/${blogId}/comments?${queryParams.toString()}`
     : '';
 
-  const { data, isLoading, error, isValidating } = useSWR<CommentsData>(url, fetcher, {
+  const { data, isLoading, error, isValidating } = useSWR<CommentsData>(url, (args) => modelFetcher(args, CommentModel, true), {
     ...swrOptions,
     revalidateOnFocus: true,
   });
