@@ -3,18 +3,16 @@
 *************************************** */
 @import '@fontsource-variable/public-sans';
 
-@import '@fontsource/barlow/400.css';
-@import '@fontsource/barlow/500.css';
-@import '@fontsource/barlow/600.css';
+/* Barlow: only load weights actually used in typography (h1-h6 use 700/800) */
 @import '@fontsource/barlow/700.css';
 @import '@fontsource/barlow/800.css';
 
 /** **************************************
-* Fonts: options
+* Fonts: options (loaded on-demand via font-loader.ts when user switches font)
 *************************************** */
-@import '@fontsource-variable/dm-sans';
-@import '@fontsource-variable/inter';
-@import '@fontsource-variable/nunito-sans';
+/* @import '@fontsource-variable/dm-sans'; — lazy loaded */
+/* @import '@fontsource-variable/inter'; — lazy loaded */
+/* @import '@fontsource-variable/nunito-sans'; — lazy loaded */
 
 /** **************************************
 * Plugins
