@@ -25,8 +25,8 @@ export function HeroBackground({ sx, ...other }: BoxProps) {
       height="1080"
       fill="none"
       viewBox="0 0 1440 1080"
-      initial="hidden"
-      animate="visible"
+      initial={mdUp ? 'hidden' : false}
+      animate={mdUp ? 'visible' : undefined}
       sx={[{ width: 1, height: 1 }]}
     >
       <defs>
@@ -58,8 +58,8 @@ export function HeroBackground({ sx, ...other }: BoxProps) {
   const renderBackground = () => (
     <Box
       component={m.div}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
+      initial={mdUp ? { opacity: 0 } : false}
+      animate={mdUp ? { opacity: 1 } : undefined}
       sx={[
         (theme) => ({
           ...theme.mixins.bgGradient({

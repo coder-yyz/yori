@@ -31,14 +31,15 @@ const smKey: Breakpoint = 'sm';
 const mdKey: Breakpoint = 'md';
 const lgKey: Breakpoint = 'lg';
 
-const motionProps: MotionProps = {
-  variants: varFade('inUp', { distance: 24 }),
-};
-
 export function HomeHero({ sx, ...other }: BoxProps) {
   const scrollProgress = useScrollPercent();
 
   const mdUp = useMediaQuery((theme) => theme.breakpoints.up(mdKey));
+
+  // On mobile: disable all animations to reduce JS execution time (framer-motion is slow on mobile CPU)
+  const motionProps: MotionProps = mdUp
+    ? { variants: varFade('inUp', { distance: 24 }) }
+    : {};
 
   const distance = mdUp ? scrollProgress.percent : 0;
 
