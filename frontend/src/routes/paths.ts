@@ -50,5 +50,5 @@ export const paths = {
   page404: '/error/404',
   page500: '/error/500',
   blank: '/blank',
-  home: '/',
+  home: '/blog',
 };

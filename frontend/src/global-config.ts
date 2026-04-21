@@ -10,7 +10,7 @@ export type ConfigValue = {
   serverUrl: string;
   assetsDir: string;
   auth: {
-    method: 'jwt' | 'amplify' | 'firebase' | 'supabase' | 'auth0';
+    method: 'jwt';
     skip: boolean;
     redirectPath: string;
   };
@@ -23,10 +23,6 @@ export const CONFIG: ConfigValue = {
   appVersion: packageJson.version,
   serverUrl: import.meta.env.VITE_SERVER_URL ?? 'http://localhost:2000',
   assetsDir: import.meta.env.VITE_ASSETS_DIR ?? '',
-  /**
-   * Auth
-   * @method jwt | amplify | firebase | supabase | auth0
-   */
   auth: {
     method: 'jwt',
     skip: false,

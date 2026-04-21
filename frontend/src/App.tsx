@@ -8,11 +8,11 @@ import { Snackbar } from 'src/components/Snackbar';
 import { LocalizationProvider } from 'src/locales';
 import { themeConfig, ThemeProvider } from 'src/theme';
 import { ProgressBar } from 'src/components/ProgressBar';
-import { initTrackingSDK, setTrackingUserContext } from 'src/lib/tracking/sdk';
 import { I18nProvider } from 'src/locales/i18n-provider';
 import { MotionLazy } from 'src/components/Animate/motion-lazy';
 import { AuthProvider as JwtAuthProvider } from 'src/auth/context/jwt';
 import { defaultSettings, SettingsProvider } from 'src/components/Settings';
+import { initTrackingSDK, setTrackingUserContext } from 'src/lib/tracking/sdk';
 
 const SettingsDrawer = lazy(() =>
   import('src/components/Settings/drawer/settings-drawer').then((m) => ({
@@ -20,11 +20,7 @@ const SettingsDrawer = lazy(() =>
   }))
 );
 
-// ----------------------------------------------------------------------
-
 const AuthProvider = JwtAuthProvider;
-
-// ----------------------------------------------------------------------
 
 type AppProps = {
   children: React.ReactNode;
@@ -59,8 +55,6 @@ export default function App({ children }: AppProps) {
     </I18nProvider>
   );
 }
-
-// ----------------------------------------------------------------------
 
 function useScrollToTop() {
   const pathname = usePathname();

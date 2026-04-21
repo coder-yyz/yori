@@ -12,7 +12,6 @@ import { SplashScreen } from 'src/components/LoadingScreen';
 // Blog
 const BlogHome = lazy(() => import('src/pages/Blog/List'));
 
-const BlogTimeline = lazy(() => import('src/pages/Blog/Timeline'));
 const BlogDetail = lazy(() => import('src/pages/Blog/Details'));
 
 // Error
@@ -52,7 +51,6 @@ export const mainRoutes: RouteObject[] = [
             children: [
               { index: true, element: <BlogHome /> },
               { path: 'list', element: <BlogHome /> },
-              { path: 'timeline', element: <BlogTimeline /> },
               { path: ':id', element: <BlogDetail /> },
             ],
           },

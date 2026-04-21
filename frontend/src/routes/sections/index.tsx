@@ -12,7 +12,7 @@ import { adminRoutes } from './admin';
 
 // ----------------------------------------------------------------------
 
-const HomePage = lazy(() => import('src/pages/Home'));
+const HomePage = lazy(() => import('src/pages/Blog/List'));
 const Page404 = lazy(() => import('src/pages/Error404'));
 
 export const routesSection: RouteObject[] = [

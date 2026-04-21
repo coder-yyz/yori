@@ -1,6 +1,6 @@
 import 'reflect-metadata';
-import { Model, Property, Transform, Type, DefaultValue, Mock, Logger } from 'transform-model';
 import dayjs from 'dayjs';
+import { Type, Mock, Model, Logger, Property, Transform, DefaultValue } from 'transform-model';
 
 // ─── 工具函数 ──────────────────────────────────────────────────────────────────
 
@@ -72,7 +72,6 @@ export class AuthorModel extends Model {
 
   @Property('displayName')
   @DefaultValue('匿名作者')
-  @Mock('Mock作者')
   displayName: string;
 
   @Property('photoURL')
@@ -125,7 +124,9 @@ export class BlogItemModel extends Model {
   @Transform(formatDate)
   @Logger((info) => {
     if (import.meta.env.DEV) {
-      console.debug(`[BlogItemModel] createdAt raw=${info.rawValues[0]} → ${info.transformedValue}`);
+      console.debug(
+        `[BlogItemModel] createdAt raw=${info.rawValues[0]} → ${info.transformedValue}`
+      );
     }
   })
   createdAt: string;
@@ -173,9 +174,7 @@ export class BlogItemModel extends Model {
 
   /** 便捷方法：摘要（截取 description 前 100 字） */
   excerpt(len = 100) {
-    return this.description.length > len
-      ? `${this.description.slice(0, len)}…`
-      : this.description;
+    return this.description.length > len ? `${this.description.slice(0, len)}…` : this.description;
   }
 }
 

@@ -5,7 +5,9 @@ import { formatDate, safeNumber } from './blog.model';
 // ─── PhotoTag ─────────────────────────────────────────────────────────────────
 
 export class PhotoTagModel extends Model {
-  @Property('id') @DefaultValue('') id: string;
+  @Property('id')
+  @DefaultValue('')
+  id: string;
 
   @Property('name') @DefaultValue('未知标签') name: string;
 
