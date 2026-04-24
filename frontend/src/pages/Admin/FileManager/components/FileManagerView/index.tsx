@@ -1,6 +1,7 @@
 import type { IFile, IFileFilters } from 'src/types/file';
 
 import { useMemo, useState, useCallback } from 'react';
+import useSWR from 'swr';
 import { useBoolean, useSetState } from 'minimal-shared/hooks';
 
 import Box from '@mui/material/Box';
@@ -26,7 +27,7 @@ const FILE_TYPE_OPTIONS = [
   'powerpoint',
   'pdf',
 ];
-import { adminDeleteUpload, useGetAdminUploads } from 'src/actions/upload';
+import { deleteFile, getFileList } from 'src/http';
 
 import { toast } from 'src/components/Snackbar';
 import { Iconify } from 'src/components/Iconify';
@@ -52,7 +53,16 @@ export function FileManagerView() {
 
   const [displayMode, setDisplayMode] = useState('list');
 
-  const { uploads, uploadsLoading } = useGetAdminUploads({ page: 1, pageSize: 200 });
+  const {
+    data,
+    isLoading: uploadsLoading,
+    mutate,
+  } = useSWR(
+    ['adminUploads', { page: 1, pageSize: 200 }],
+    () => getFileList({ page: 1, pageSize: 200 }),
+    { revalidateIfStale: false, revalidateOnFocus: false, revalidateOnReconnect: false }
+  );
+  const uploads = data?.list ?? [];
 
   // Map backend uploads to IFile shape
   const tableData: IFile[] = useMemo(
@@ -110,21 +120,23 @@ export function FileManagerView() {
   const handleDeleteItem = useCallback(
     async (id: string) => {
       try {
-        await adminDeleteUpload(id);
+        await deleteFile(id);
         toast.success('Delete success!');
+        mutate();
         table.onUpdatePageDeleteRow(dataInPage.length);
       } catch (error) {
         console.error(error);
         toast.error('Delete failed!');
       }
     },
-    [dataInPage.length, table]
+    [dataInPage.length, table, mutate]
   );
 
   const handleDeleteItems = useCallback(async () => {
     try {
-      await Promise.all(table.selected.map((id) => adminDeleteUpload(id)));
+      await Promise.all(table.selected.map((id) => deleteFile(id)));
       toast.success('Delete success!');
+      mutate();
       table.onUpdatePageDeleteRows(dataInPage.length, dataFiltered.length);
     } catch (error) {
       console.error(error);

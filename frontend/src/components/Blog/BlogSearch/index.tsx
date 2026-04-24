@@ -1,7 +1,8 @@
 import type { Theme, SxProps } from '@mui/material/styles';
-import type { BlogItem } from 'src/types/blog';
+import type { BlogItemModel } from 'src/models';
 
 import { useState, useCallback } from 'react';
+import useSWR from 'swr';
 import parse from 'autosuggest-highlight/parse';
 import match from 'autosuggest-highlight/match';
 import { useDebounce } from 'minimal-shared/hooks';
@@ -17,7 +18,7 @@ import Autocomplete, { autocompleteClasses, createFilterOptions } from '@mui/mat
 import { useRouter } from 'src/routes/hooks';
 import { RouterLink } from 'src/routes/components';
 
-import { useSearchBlogs } from 'src/actions/blog';
+import { searchBlogs } from 'src/http';
 
 import { Iconify } from 'src/components/Iconify';
 import { SearchNotFound } from 'src/components/SearchNotFound';
@@ -33,13 +34,23 @@ export function BlogSearch({ redirectPath, sx }: Props) {
   const router = useRouter();
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedItem, setSelectedItem] = useState<BlogItem | null>(null);
+  const [selectedItem, setSelectedItem] = useState<BlogItemModel | null>(null);
 
   const debouncedQuery = useDebounce(searchQuery);
-  const { searchResults: options, searchLoading: loading } = useSearchBlogs(debouncedQuery);
+  const { data, isLoading: loading } = useSWR(
+    debouncedQuery ? ['searchBlogs', debouncedQuery] : null,
+    () => searchBlogs(debouncedQuery),
+    {
+      revalidateIfStale: false,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      keepPreviousData: true,
+    }
+  );
+  const options = (data?.list ?? []) as BlogItemModel[];
 
   const handleChange = useCallback(
-    (item: BlogItem | null) => {
+    (item: BlogItemModel | null) => {
       setSelectedItem(item);
       if (item) {
         router.push(redirectPath(item.id));
@@ -50,7 +61,7 @@ export function BlogSearch({ redirectPath, sx }: Props) {
 
   const filterOptions = createFilterOptions({
     matchFrom: 'any',
-    stringify: (option: BlogItem) => `${option.title} ${option.description}`,
+    stringify: (option: BlogItemModel) => `${option.title} ${option.description}`,
   });
 
   const paperStyles: SxProps<Theme> = {

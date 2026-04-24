@@ -19,13 +19,13 @@ import { useRouter } from 'src/routes/hooks';
 
 import { fData } from 'src/utils/format-number';
 
-import { uploadFile } from 'src/actions/blog';
+import { uploadFile } from 'src/http';
 import {
   adminCreateUser,
   adminDeleteUser,
   adminUpdateUserRole,
   adminUpdateUserStatus,
-} from 'src/actions/user';
+} from 'src/http';
 
 import { Label } from 'src/components/Label';
 import { toast } from 'src/components/Snackbar';

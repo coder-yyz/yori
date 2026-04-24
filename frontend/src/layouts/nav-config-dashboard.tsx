@@ -36,7 +36,6 @@ const ICONS = {
   subpaths: icon('ic-subpaths'),
   menuItem: icon('ic-menu-item'),
   ecommerce: icon('ic-ecommerce'),
-  analytics: icon('ic-analytics'),
   dashboard: icon('ic-dashboard'),
 };
 
@@ -63,15 +62,7 @@ export const navData: NavSectionProps['data'] = [
    */
   {
     subheader: 'Overview',
-    items: [
-      { title: 'Home', path: paths.admin.home, icon: ICONS.dashboard },
-      {
-        title: 'Analytics',
-        path: paths.admin.analytics,
-        icon: ICONS.analytics,
-        allowedRoles: ['root', 'admin'],
-      },
-    ],
+    items: [{ title: 'Home', path: paths.admin.home, icon: ICONS.dashboard }],
   },
   /**
    * Management

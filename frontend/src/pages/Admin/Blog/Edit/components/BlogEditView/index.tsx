@@ -1,4 +1,4 @@
-import type { BlogItem } from 'src/types/blog';
+import type { BlogItemModel } from 'src/models';
 
 import { paths } from 'src/routes/paths';
 
@@ -11,7 +11,7 @@ import { BlogCreateEditForm } from '../../../components/BlogCreateEditForm';
 // ----------------------------------------------------------------------
 
 type Props = {
-  blog?: BlogItem;
+  blog?: BlogItemModel;
 };
 
 export function BlogEditView({ blog }: Props) {

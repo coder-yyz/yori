@@ -12,8 +12,8 @@ import Typography from '@mui/material/Typography';
 
 import { fData } from 'src/utils/format-number';
 
-import { uploadFile } from 'src/actions/blog';
-import { updateProfile } from 'src/actions/user';
+import { uploadFile } from 'src/http';
+import { updateProfile } from 'src/http';
 
 import { toast } from 'src/components/Snackbar';
 import { Form, Field, schemaUtils } from 'src/components/HookForm';

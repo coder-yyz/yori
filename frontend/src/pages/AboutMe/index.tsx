@@ -1,6 +1,10 @@
 import { CONFIG } from 'src/global-config';
 
-import { AboutView } from './components/AboutView';
+import { AboutHero } from './components/AboutHero';
+import { AboutTeam } from './components/AboutTeam';
+import { AboutWhat } from './components/AboutWhat';
+import { AboutVision } from './components/AboutVision';
+import { AboutTestimonials } from './components/AboutTestimonials';
 
 // ----------------------------------------------------------------------
 
@@ -11,7 +15,15 @@ export default function Page() {
     <>
       <title>{metadata.title}</title>
 
-      <AboutView />
+      <AboutHero />
+
+      <AboutWhat />
+
+      <AboutVision />
+
+      <AboutTeam />
+
+      <AboutTestimonials />
     </>
   );
 }

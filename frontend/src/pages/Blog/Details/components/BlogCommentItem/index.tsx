@@ -1,4 +1,4 @@
-import type { Comment } from 'src/types/blog';
+import type { CommentModel } from 'src/models';
 
 import { useBoolean } from 'minimal-shared/hooks';
 
@@ -10,7 +10,7 @@ import IconButton from '@mui/material/IconButton';
 
 import { fDate } from 'src/utils/format-time';
 
-import { likeComment, deleteComment } from 'src/actions/blog';
+import { likeComment, deleteComment } from 'src/http';
 
 import { toast } from 'src/components/Snackbar';
 import { Iconify } from 'src/components/Iconify';
@@ -22,7 +22,7 @@ import { BlogCommentForm } from '../BlogCommentForm';
 // ----------------------------------------------------------------------
 
 type Props = {
-  comment: Comment;
+  comment: CommentModel;
   blogId: string;
   hasReply?: boolean;
   parentId?: string;

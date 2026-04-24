@@ -1,5 +1,5 @@
 import type { CardProps } from '@mui/material/Card';
-import type { BlogItem } from 'src/types/blog';
+import type { BlogItemModel } from 'src/models';
 
 import { usePopover } from 'minimal-shared/hooks';
 
@@ -18,7 +18,7 @@ import { RouterLink } from 'src/routes/components';
 import { fDate } from 'src/utils/format-time';
 import { fShortenNumber } from 'src/utils/format-number';
 
-import { deleteBlog } from 'src/actions/blog';
+import { deleteBlog } from 'src/http';
 
 import { Label } from 'src/components/Label';
 import { Image } from 'src/components/Image';
@@ -27,7 +27,7 @@ import { Iconify } from 'src/components/Iconify';
 import { CustomPopover } from 'src/components/CustomPopover';
 
 type Props = CardProps & {
-  blog: BlogItem;
+  blog: BlogItemModel;
   editHref: string;
   detailsHref: string;
 };

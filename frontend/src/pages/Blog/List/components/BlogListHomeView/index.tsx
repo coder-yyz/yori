@@ -1,6 +1,7 @@
-import type { BlogItem } from 'src/types/blog';
+import type { BlogItemModel } from 'src/models';
 
 import { useState } from 'react';
+import useSWR from 'swr';
 import { orderBy } from 'es-toolkit';
 
 import Box from '@mui/material/Box';
@@ -10,7 +11,7 @@ import Typography from '@mui/material/Typography';
 
 import { paths } from 'src/routes/paths';
 
-import { useGetBlogs } from 'src/actions/blog';
+import { getBlogs } from 'src/http';
 
 const BLOG_SORT_OPTIONS = [
   { value: 'latest', label: 'Latest' },
@@ -32,7 +33,13 @@ export function BlogListHomeView() {
   const [sortBy, setSortBy] = useState('latest');
   const [page, setPage] = useState(1);
 
-  const { blogs, blogsTotal, blogsLoading } = useGetBlogs({ page, pageSize: PAGE_SIZE });
+  const { data, isLoading: blogsLoading } = useSWR(
+    ['blogs', { page, pageSize: PAGE_SIZE }],
+    () => getBlogs({ page, pageSize: PAGE_SIZE }),
+    { revalidateIfStale: false, revalidateOnFocus: false, revalidateOnReconnect: false }
+  );
+  const blogs = data?.list ?? [];
+  const blogsTotal = data?.total ?? 0;
 
   const dataFiltered = applyFilter({ inputData: blogs, sortBy });
 
@@ -86,7 +93,7 @@ export function BlogListHomeView() {
 // ----------------------------------------------------------------------
 
 type ApplyFilterProps = {
-  inputData: BlogItem[];
+  inputData: BlogItemModel[];
   sortBy: string;
 };
 

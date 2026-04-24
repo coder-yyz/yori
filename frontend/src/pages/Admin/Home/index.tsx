@@ -1,3 +1,5 @@
+import useSWR from 'swr';
+
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Grid from '@mui/material/Grid';
@@ -7,9 +9,7 @@ import CardContent from '@mui/material/CardContent';
 import { paths } from 'src/routes/paths';
 import { RouterLink } from 'src/routes/components';
 
-import { useGetAdminBlogs } from 'src/actions/blog';
-import { useGetAdminUsers } from 'src/actions/user';
-import { useGetAdminUploads } from 'src/actions/upload';
+import { getAdminBlogs, getUsersList, getFileList } from 'src/http';
 import { DashboardContent } from 'src/layouts/dashboard';
 
 import { Iconify } from 'src/components/Iconify';
@@ -71,9 +71,29 @@ function StatCard({
 }
 
 export default function Page() {
-  const { blogsTotal } = useGetAdminBlogs({ page: 1, pageSize: 1 });
-  const { usersTotal } = useGetAdminUsers({ page: 1, pageSize: 1 });
-  const { uploadsTotal } = useGetAdminUploads({ page: 1, pageSize: 1 });
+  const swrOptions = {
+    revalidateIfStale: false,
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+  };
+  const { data: blogsData } = useSWR(
+    ['adminBlogs', { page: 1, pageSize: 1 }],
+    () => getAdminBlogs({ page: 1, pageSize: 1 }),
+    swrOptions
+  );
+  const { data: usersData } = useSWR(
+    ['adminUsers', { page: 1, pageSize: 1 }],
+    () => getUsersList({ page: 1, pageSize: 1 }),
+    swrOptions
+  );
+  const { data: uploadsData } = useSWR(
+    ['adminUploads', { page: 1, pageSize: 1 }],
+    () => getFileList({ page: 1, pageSize: 1 }),
+    swrOptions
+  );
+  const blogsTotal = blogsData?.total ?? 0;
+  const usersTotal = usersData?.total ?? 0;
+  const uploadsTotal = uploadsData?.total ?? 0;
 
   return (
     <>

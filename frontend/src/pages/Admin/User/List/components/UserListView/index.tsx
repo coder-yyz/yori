@@ -2,6 +2,7 @@ import type { TableHeadCellProps } from 'src/components/Table';
 import type { IUserItem, IUserTableFilters } from 'src/types/user';
 
 import { useMemo, useCallback } from 'react';
+import useSWR from 'swr';
 import { varAlpha } from 'minimal-shared/utils';
 import { useBoolean, useSetState } from 'minimal-shared/hooks';
 
@@ -18,7 +19,7 @@ import IconButton from '@mui/material/IconButton';
 import { paths } from 'src/routes/paths';
 
 import { DashboardContent } from 'src/layouts/dashboard';
-import { adminDeleteUser, useGetAdminUsers } from 'src/actions/user';
+import { deleteUser, getUsersList } from 'src/http';
 
 import { Label } from 'src/components/Label';
 import { toast } from 'src/components/Snackbar';
@@ -84,7 +85,13 @@ export function UserListView() {
   const filters = useSetState<IUserTableFilters>({ name: '', role: [], status: 'all' });
   const { state: currentFilters, setState: updateFilters } = filters;
 
-  const { users, usersEmpty } = useGetAdminUsers();
+  const { data, mutate } = useSWR('adminUsers', getUsersList, {
+    revalidateIfStale: false,
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+  });
+  const users = data?.list ?? [];
+  const usersEmpty = !users.length;
 
   const dataFiltered = applyFilter({
     inputData: users as IUserItem[],
@@ -102,21 +109,23 @@ export function UserListView() {
   const handleDeleteRow = useCallback(
     async (id: string) => {
       try {
-        await adminDeleteUser(id);
+        await deleteUser(id);
         toast.success('Delete success!');
+        mutate();
         table.onUpdatePageDeleteRow(dataInPage.length);
       } catch (error) {
         console.error(error);
         toast.error('Delete failed!');
       }
     },
-    [dataInPage.length, table]
+    [dataInPage.length, table, mutate]
   );
 
   const handleDeleteRows = useCallback(async () => {
     try {
-      await Promise.all(table.selected.map((id) => adminDeleteUser(id)));
+      await Promise.all(table.selected.map((id) => deleteUser(id)));
       toast.success('Delete success!');
+      mutate();
       table.onUpdatePageDeleteRows(dataInPage.length, dataFiltered.length);
     } catch (error) {
       console.error(error);

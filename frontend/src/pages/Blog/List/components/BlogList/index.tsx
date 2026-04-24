@@ -1,4 +1,4 @@
-import type { BlogItem } from 'src/types/blog';
+import type { BlogItemModel } from 'src/models';
 
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
@@ -12,7 +12,7 @@ import { BlogItemCard, BlogItemLatest } from '../../../components/BlogItemCard';
 // ----------------------------------------------------------------------
 
 type Props = {
-  blogs: BlogItem[];
+  blogs: BlogItemModel[];
   loading?: boolean;
 };
 

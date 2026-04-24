@@ -1,6 +1,6 @@
 import type { BoxProps } from '@mui/material/Box';
 import type { CardProps } from '@mui/material/Card';
-import type { BlogItem } from 'src/types/blog';
+import type { BlogItemModel } from 'src/models';
 
 import { varAlpha } from 'minimal-shared/utils';
 
@@ -24,7 +24,7 @@ import { Iconify } from 'src/components/Iconify';
 // ----------------------------------------------------------------------
 
 type BlogItemCardProps = CardProps & {
-  blog: BlogItem;
+  blog: BlogItemModel;
   detailsHref: string;
 };
 
@@ -92,7 +92,7 @@ export function BlogItemCard({ blog, detailsHref, sx, ...other }: BlogItemCardPr
 // ----------------------------------------------------------------------
 
 type BlogItemLatestProps = {
-  blog: BlogItem;
+  blog: BlogItemModel;
   index: number;
   detailsHref: string;
 };
@@ -177,7 +177,8 @@ export function BlogItemLatest({ blog, index, detailsHref }: BlogItemLatestProps
 
 // ----------------------------------------------------------------------
 
-type InfoBlockProps = BoxProps & Pick<BlogItem, 'totalViews' | 'totalShares' | 'totalComments'>;
+type InfoBlockProps = BoxProps &
+  Pick<BlogItemModel, 'totalViews' | 'totalShares' | 'totalComments'>;
 
 function InfoBlock({ sx, totalViews, totalShares, totalComments, ...other }: InfoBlockProps) {
   return (

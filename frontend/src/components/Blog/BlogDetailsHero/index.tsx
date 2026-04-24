@@ -1,5 +1,5 @@
 import type { BoxProps } from '@mui/material/Box';
-import type { BlogItem } from 'src/types/blog';
+import type { BlogItemModel } from 'src/models';
 
 import { varAlpha } from 'minimal-shared/utils';
 
@@ -33,7 +33,7 @@ export function BlogDetailsHero({
   coverUrl,
   createdAt,
   ...other
-}: BoxProps & Partial<BlogItem>) {
+}: BoxProps & Partial<BlogItemModel>) {
   const smUp = useMediaQuery((theme) => theme.breakpoints.up('sm'));
   const { previewUrl } = useFilePreview(coverUrl);
 

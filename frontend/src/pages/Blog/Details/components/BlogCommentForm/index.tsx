@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 
-import { createComment } from 'src/actions/blog';
+import { createComment } from 'src/http';
 
 import { toast } from 'src/components/Snackbar';
 import { Form, Field } from 'src/components/HookForm';

@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import useSWR from 'swr';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -21,11 +22,11 @@ import { paths } from 'src/routes/paths';
 
 import { DashboardContent } from 'src/layouts/dashboard';
 import {
-  useGetAdminPhotoTags,
+  getAdminPhotoTags,
   adminCreatePhotoTag,
   adminUpdatePhotoTag,
   adminDeletePhotoTag,
-} from 'src/actions/photo';
+} from 'src/http';
 
 import { toast } from 'src/components/Snackbar';
 import { Iconify } from 'src/components/Iconify';
@@ -39,11 +40,18 @@ export function PhotoTagListView() {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState('');
 
-  const { tags, tagsTotal, tagsLoading } = useGetAdminPhotoTags({
-    page: page + 1,
-    pageSize: rowsPerPage,
-    search,
+  const queryParams = { page: page + 1, pageSize: rowsPerPage, search };
+  const {
+    data,
+    isLoading: tagsLoading,
+    mutate,
+  } = useSWR(['adminPhotoTags', queryParams], () => getAdminPhotoTags(queryParams), {
+    revalidateIfStale: false,
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
   });
+  const tags = data?.list ?? [];
+  const tagsTotal = data?.total ?? 0;
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingTag, setEditingTag] = useState<{ id: string; name: string } | null>(null);
@@ -82,6 +90,7 @@ export function PhotoTagListView() {
         await adminCreatePhotoTag({ name: tagName.trim() });
         toast.success('标签已创建');
       }
+      mutate();
       handleClose();
     } catch (error: any) {
       toast.error(error?.message || '操作失败');
@@ -90,14 +99,18 @@ export function PhotoTagListView() {
     }
   };
 
-  const handleDelete = useCallback(async (id: string) => {
-    try {
-      await adminDeletePhotoTag(id);
-      toast.success('标签已删除');
-    } catch (error: any) {
-      toast.error(error?.message || '删除失败');
-    }
-  }, []);
+  const handleDelete = useCallback(
+    async (id: string) => {
+      try {
+        await adminDeletePhotoTag(id);
+        toast.success('标签已删除');
+        mutate();
+      } catch (error: any) {
+        toast.error(error?.message || '删除失败');
+      }
+    },
+    [mutate]
+  );
 
   return (
     <DashboardContent>

@@ -1,4 +1,4 @@
-import type { BlogItem } from 'src/types/blog';
+import type { BlogItemModel } from 'src/models';
 
 import { useState, useEffect, useCallback } from 'react';
 
@@ -12,7 +12,7 @@ import Typography from '@mui/material/Typography';
 import { paths } from 'src/routes/paths';
 import { RouterLink } from 'src/routes/components';
 
-import { updateBlog } from 'src/actions/blog';
+import { updateBlog } from 'src/http';
 import { DashboardContent } from 'src/layouts/dashboard';
 
 import { toast } from 'src/components/Snackbar';
@@ -25,7 +25,7 @@ import { BlogDetailsSkeleton } from 'src/components/Blog/BlogSkeleton';
 import { BlogDetailsToolbar } from '../BlogDetailsToolbar';
 
 type Props = {
-  blog?: BlogItem;
+  blog?: BlogItemModel;
   loading?: boolean;
   error?: any;
 };
@@ -114,7 +114,10 @@ export function BlogDetailsView({ blog, loading, error }: Props) {
       >
         <Typography variant="subtitle1">{blog?.description}</Typography>
 
-        <Markdown contentType={blog?.contentType} children={blog?.content} />
+        <Markdown
+          contentType={blog?.contentType as 'html' | 'markdown' | undefined}
+          children={blog?.content}
+        />
 
         <Stack
           spacing={3}

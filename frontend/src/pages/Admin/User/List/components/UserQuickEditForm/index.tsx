@@ -13,7 +13,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 
-import { adminUpdateUserRole, adminUpdateUserStatus } from 'src/actions/user';
+import { adminUpdateUserRole, adminUpdateUserStatus } from 'src/http';
 
 import { toast } from 'src/components/Snackbar';
 import { Form, Field } from 'src/components/HookForm';

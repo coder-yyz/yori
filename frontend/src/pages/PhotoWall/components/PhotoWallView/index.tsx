@@ -1,6 +1,7 @@
-import type { PhotoTag } from 'src/types/photo';
+import type { PhotoTagModel } from 'src/models';
 
 import { useState } from 'react';
+import useSWR from 'swr';
 
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
@@ -9,7 +10,7 @@ import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import Masonry from '@mui/lab/Masonry';
 
-import { useGetAllPhotos, useGetPhotoTags } from 'src/actions/photo';
+import { getAllPublicPhotos, getAllPublicPhotoTags } from 'src/http';
 
 import { Lightbox, useLightbox } from 'src/components/Lightbox';
 
@@ -18,8 +19,18 @@ import { Lightbox, useLightbox } from 'src/components/Lightbox';
 export function PhotoWallView() {
   const [selectedTag, setSelectedTag] = useState<string>('');
 
-  const { tags } = useGetPhotoTags();
-  const { photos, photosLoading } = useGetAllPhotos(selectedTag || undefined);
+  const { data: tagsData } = useSWR('publicPhotoTags', getAllPublicPhotoTags, {
+    revalidateIfStale: false,
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+  });
+  const tags = tagsData ?? [];
+  const { data: photosData, isLoading: photosLoading } = useSWR(
+    ['publicPhotos', selectedTag],
+    () => getAllPublicPhotos(selectedTag || undefined),
+    { revalidateIfStale: false, revalidateOnFocus: false, revalidateOnReconnect: false }
+  );
+  const photos = photosData ?? [];
 
   const slides = photos
     .filter((p) => p.mimeType?.startsWith('image/') && !p.mimeType.includes('tiff'))
@@ -27,13 +38,19 @@ export function PhotoWallView() {
 
   const lightbox = useLightbox(slides);
 
-  const handleTagClick = (tag: PhotoTag) => {
+  const handleTagClick = (tag: PhotoTagModel) => {
     setSelectedTag((prev) => (prev === tag.id ? '' : tag.id));
   };
 
   return (
-    <Container maxWidth="lg" sx={{ pt: { xs: 3, md: 5 }, pb: { xs: 5, md: 10 }, px: { xs: 2, sm: 3 } }}>
-      <Typography variant="h3" sx={{ mb: { xs: 1.5, md: 2 }, fontSize: { xs: '1.5rem', sm: '2rem', md: '2.5rem' } }}>
+    <Container
+      maxWidth="lg"
+      sx={{ pt: { xs: 3, md: 5 }, pb: { xs: 5, md: 10 }, px: { xs: 2, sm: 3 } }}
+    >
+      <Typography
+        variant="h3"
+        sx={{ mb: { xs: 1.5, md: 2 }, fontSize: { xs: '1.5rem', sm: '2rem', md: '2.5rem' } }}
+      >
         Photo Wall
       </Typography>
 

@@ -9,7 +9,7 @@ import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
 
-import { changePassword } from 'src/actions/user';
+import { changePassword } from 'src/http';
 
 import { toast } from 'src/components/Snackbar';
 import { Iconify } from 'src/components/Iconify';

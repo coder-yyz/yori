@@ -45,7 +45,6 @@ func InitDB() {
 		&model.Photo{},
 		&model.PhotoTag{},
 		&model.PhotoTagLink{},
-		&model.TrackEvent{},
 	); err != nil {
 		log.Fatal("数据库迁移失败:", err)
 	}

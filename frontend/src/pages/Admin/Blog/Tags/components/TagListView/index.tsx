@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import useSWR from 'swr';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -20,7 +21,7 @@ import TablePagination from '@mui/material/TablePagination';
 import { paths } from 'src/routes/paths';
 
 import { DashboardContent } from 'src/layouts/dashboard';
-import { createTag, updateTag, deleteTag, useGetTags } from 'src/actions/blog';
+import { createTag, updateTag, deleteTag, getTags } from 'src/http';
 
 import { toast } from 'src/components/Snackbar';
 import { Iconify } from 'src/components/Iconify';
@@ -34,11 +35,18 @@ export function TagListView() {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState('');
 
-  const { tags, tagsTotal, tagsLoading } = useGetTags({
-    page: page + 1,
-    pageSize: rowsPerPage,
-    search,
+  const queryParams = { page: page + 1, pageSize: rowsPerPage, search };
+  const {
+    data,
+    isLoading: tagsLoading,
+    mutate,
+  } = useSWR(['tags', queryParams], () => getTags(queryParams), {
+    revalidateIfStale: false,
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
   });
+  const tags = data?.list ?? [];
+  const tagsTotal = data?.total ?? 0;
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingTag, setEditingTag] = useState<{ id: string; name: string } | null>(null);
@@ -77,6 +85,7 @@ export function TagListView() {
         await createTag(tagName.trim());
         toast.success('Tag created!');
       }
+      mutate();
       handleClose();
     } catch (error: any) {
       toast.error(error?.message || 'Operation failed');
@@ -85,14 +94,18 @@ export function TagListView() {
     }
   };
 
-  const handleDelete = useCallback(async (id: string) => {
-    try {
-      await deleteTag(id);
-      toast.success('Tag deleted!');
-    } catch (error: any) {
-      toast.error(error?.message || 'Delete failed');
-    }
-  }, []);
+  const handleDelete = useCallback(
+    async (id: string) => {
+      try {
+        await deleteTag(id);
+        toast.success('Tag deleted!');
+        mutate();
+      } catch (error: any) {
+        toast.error(error?.message || 'Delete failed');
+      }
+    },
+    [mutate]
+  );
 
   return (
     <DashboardContent>

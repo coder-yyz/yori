@@ -1,8 +1,5 @@
-import type { AxiosRequestConfig } from 'axios';
-import type { Model } from 'transform-model';
-
-import axios from 'axios';
-import { createModel } from 'transform-model';
+import axios, { type AxiosRequestConfig } from 'axios';
+import { type Model, createModel } from 'transform-model';
 
 import { CONFIG } from 'src/global-config';
 
@@ -172,13 +169,6 @@ export const endpoints = {
     create: '/api/admin/photo-tags',
     update: '/api/admin/photo-tags',
     delete: '/api/admin/photo-tags',
-  },
-  tracking: {
-    events: '/api/track/events',
-  },
-  adminAnalytics: {
-    overview: '/api/admin/analytics/overview',
-    events: '/api/admin/analytics/events',
   },
   me: {
     root: '/api/me',

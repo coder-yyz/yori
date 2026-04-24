@@ -1,6 +1,7 @@
-import type { BlogItem, ContentType } from 'src/types/blog';
+import type { BlogItemModel } from 'src/models';
 
 import * as z from 'zod';
+import useSWR from 'swr';
 import { useForm } from 'react-hook-form';
 import { useState, useCallback } from 'react';
 import { useBoolean } from 'minimal-shared/hooks';
@@ -23,13 +24,7 @@ import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
 
-import {
-  createBlog,
-  updateBlog,
-  uploadFile,
-  useGetAllTags,
-  useGetAllCategories,
-} from 'src/actions/blog';
+import { createBlog, updateBlog, uploadFile, getAllTags, getAllCategories } from 'src/http';
 
 import { toast } from 'src/components/Snackbar';
 import { Iconify } from 'src/components/Iconify';
@@ -58,7 +53,7 @@ export const BlogCreateSchema = z.object({
 // ----------------------------------------------------------------------
 
 type Props = {
-  currentBlog?: BlogItem;
+  currentBlog?: BlogItemModel;
 };
 
 export function BlogCreateEditForm({ currentBlog }: Props) {
@@ -68,8 +63,16 @@ export function BlogCreateEditForm({ currentBlog }: Props) {
   const openDetails = useBoolean(true);
   const openProperties = useBoolean(true);
 
-  const { tags } = useGetAllTags();
-  const { categories } = useGetAllCategories();
+  const { data: tags = [] } = useSWR('allTags', getAllTags, {
+    revalidateIfStale: false,
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+  });
+  const { data: categories = [] } = useSWR('allCategories', getAllCategories, {
+    revalidateIfStale: false,
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+  });
 
   const [coverUploading, setCoverUploading] = useState(false);
 
@@ -77,7 +80,7 @@ export function BlogCreateEditForm({ currentBlog }: Props) {
     title: currentBlog?.title || '',
     description: currentBlog?.description || '',
     content: currentBlog?.content || '',
-    contentType: currentBlog?.contentType || 'markdown',
+    contentType: (currentBlog?.contentType || 'markdown') as 'html' | 'markdown',
     coverUrl: currentBlog?.coverUrl || '',
     tagIds: currentBlog?.tags?.map((t) => t.id) || [],
     categoryIds: currentBlog?.categories?.map((c) => c.id) || [],
@@ -190,7 +193,7 @@ export function BlogCreateEditForm({ currentBlog }: Props) {
                 exclusive
                 value={values.contentType}
                 onChange={(_, val) => {
-                  if (val) setValue('contentType', val as ContentType);
+                  if (val) setValue('contentType', val as 'markdown' | 'html');
                 }}
               >
                 <ToggleButton value="markdown" sx={{ px: 1.5, py: 0.25 }}>

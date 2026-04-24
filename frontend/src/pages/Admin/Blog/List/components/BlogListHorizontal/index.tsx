@@ -1,4 +1,4 @@
-import type { BlogItem } from 'src/types/blog';
+import type { BlogItemModel } from 'src/models';
 
 import Box from '@mui/material/Box';
 
@@ -9,7 +9,7 @@ import { BlogItemSkeleton } from 'src/components/Blog/BlogSkeleton';
 import { BlogItemHorizontal } from '../BlogItemHorizontal';
 
 type Props = {
-  blogs: BlogItem[];
+  blogs: BlogItemModel[];
   loading?: boolean;
 };
 

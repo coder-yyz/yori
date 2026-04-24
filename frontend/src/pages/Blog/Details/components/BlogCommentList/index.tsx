@@ -1,4 +1,4 @@
-import type { Comment } from 'src/types/blog';
+import type { CommentModel } from 'src/models';
 
 import Box from '@mui/material/Box';
 import Pagination from '@mui/material/Pagination';
@@ -9,7 +9,7 @@ import { BlogCommentItem } from '../BlogCommentItem';
 
 type Props = {
   blogId: string;
-  comments?: Comment[];
+  comments?: CommentModel[];
   total?: number;
   page?: number;
   onPageChange?: (page: number) => void;

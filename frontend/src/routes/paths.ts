@@ -32,7 +32,6 @@ export const paths = {
       root: `${ROOTS.ADMIN}/photo`,
       tags: `${ROOTS.ADMIN}/photo/tags`,
     },
-    analytics: `${ROOTS.ADMIN}/analytics`,
   },
   blog: {
     root: '/blog',

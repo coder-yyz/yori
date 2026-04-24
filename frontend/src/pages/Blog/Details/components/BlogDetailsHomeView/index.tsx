@@ -1,6 +1,7 @@
-import type { BlogItem } from 'src/types/blog';
+import type { BlogItemModel } from 'src/models';
 
 import { useState } from 'react';
+import useSWR from 'swr';
 
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
@@ -14,7 +15,7 @@ import Typography from '@mui/material/Typography';
 import { paths } from 'src/routes/paths';
 import { RouterLink } from 'src/routes/components';
 
-import { useGetComments } from 'src/actions/blog';
+import { getComments } from 'src/http';
 
 import { Iconify } from 'src/components/Iconify';
 import { Markdown } from 'src/components/Markdown';
@@ -30,8 +31,8 @@ import { BlogItemCard } from '../../../components/BlogItemCard';
 // ----------------------------------------------------------------------
 
 type Props = {
-  blog?: BlogItem;
-  latestBlogs?: BlogItem[];
+  blog?: BlogItemModel;
+  latestBlogs?: BlogItemModel[];
   loading?: boolean;
   error?: any;
 };
@@ -39,10 +40,13 @@ type Props = {
 export function BlogDetailsHomeView({ blog, latestBlogs, loading, error }: Props) {
   const [commentPage, setCommentPage] = useState(1);
 
-  const { comments, commentsTotal } = useGetComments(blog?.id || '', {
-    page: commentPage,
-    pageSize: 10,
-  });
+  const { data: commentsData } = useSWR(
+    blog?.id ? ['comments', blog.id, { page: commentPage, pageSize: 10 }] : null,
+    () => getComments(blog!.id, { page: commentPage, pageSize: 10 }),
+    { revalidateIfStale: false, revalidateOnFocus: false, revalidateOnReconnect: false }
+  );
+  const comments = commentsData?.list ?? [];
+  const commentsTotal = commentsData?.total ?? 0;
 
   if (loading) {
     return <BlogDetailsSkeleton />;
@@ -99,7 +103,10 @@ export function BlogDetailsHomeView({ blog, latestBlogs, loading, error }: Props
         <Stack sx={{ maxWidth: 720, mx: 'auto' }}>
           <Typography variant="subtitle1">{blog?.description}</Typography>
 
-          <Markdown contentType={blog?.contentType} children={blog?.content} />
+          <Markdown
+            contentType={blog?.contentType as 'html' | 'markdown' | undefined}
+            children={blog?.content}
+          />
 
           <Stack
             spacing={3}

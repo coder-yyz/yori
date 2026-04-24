@@ -1,11 +1,8 @@
-import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
 import { styled } from '@mui/material/styles';
 import Container from '@mui/material/Container';
 
 import { Logo } from 'src/components/Logo';
-
-// ----------------------------------------------------------------------
 
 const FooterRoot = styled('footer')(({ theme }) => ({
   position: 'relative',
@@ -28,7 +25,6 @@ export function Footer({ sx, ...other }: FooterProps) {
     >
       <Container>
         <Logo />
-        <Box sx={{ mt: 1, typography: 'caption' }}>© All rights reserved.</Box>
         <Link
           href="https://beian.miit.gov.cn/"
           target="_blank"

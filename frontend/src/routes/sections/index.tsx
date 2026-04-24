@@ -3,7 +3,6 @@ import type { RouteObject } from 'react-router';
 import { lazy, Suspense } from 'react';
 
 import { MainLayout } from 'src/layouts/main';
-
 import { SplashScreen } from 'src/components/LoadingScreen';
 
 import { authRoutes } from './auth';

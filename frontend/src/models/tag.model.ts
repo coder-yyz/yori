@@ -1,4 +1,4 @@
-import { createModel, DefaultValue, Model, Property } from 'transform-model';
+import { Model, Property, createModel, DefaultValue } from 'transform-model';
 
 class TagModel extends Model {
   @Property('id')

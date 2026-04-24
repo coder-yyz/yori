@@ -131,7 +131,9 @@ function getVendorChunk(id: string) {
 
 export default defineConfig({
   plugins: [
-    react(),
+    react({
+      tsDecorators: true,
+    }),
     checker({
       typescript: true,
       eslint: {

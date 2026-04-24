@@ -1,22 +1,17 @@
 import 'reflect-metadata';
+
 import dayjs from 'dayjs';
 import { Type, Mock, Model, Logger, Property, Transform, DefaultValue } from 'transform-model';
 
-// ─── 工具函数 ──────────────────────────────────────────────────────────────────
-
-/** 将后端时间字段统一格式化为 "YYYY-MM-DD HH:mm:ss"，无效值返回 '-' */
 export const formatDate = (val: any) =>
-  val && dayjs(val).isValid() ? dayjs(val).format('YYYY-MM-DD HH:mm:ss') : '-';
+  val && dayjs(val).isValid() ? dayjs(val).format('YYYY-MM-DD HH:mm:ss') : '--';
 
-/** 数字兜底：null/undefined/NaN → 0 */
 export const safeNumber = (val: any) => {
   const n = Number(val);
   return isNaN(n) ? 0 : n;
 };
 
-// ─── Tag ──────────────────────────────────────────────────────────────────────
-
-export class TagModel extends Model {
+export class BlogTagModel extends Model {
   @Property('id')
   @DefaultValue('')
   id: string;
@@ -27,13 +22,12 @@ export class TagModel extends Model {
 
   @Property('blogCount')
   @Transform(safeNumber)
-  @Mock(($i: number) => Math.floor(Math.random() * 20) + $i)
   blogCount: number;
 }
 
 // ─── Category ─────────────────────────────────────────────────────────────────
 
-export class CategoryModel extends Model {
+export class BlogCategoryModel extends Model {
   @Property('id')
   @DefaultValue('')
   id: string;
@@ -49,10 +43,6 @@ export class CategoryModel extends Model {
   @Property('description')
   @DefaultValue('')
   description: string;
-
-  @Property('coverUrl')
-  @DefaultValue('')
-  coverUrl: string;
 
   @Property('blogCount')
   @Transform(safeNumber)
@@ -108,16 +98,15 @@ export class BlogItemModel extends Model {
   coverUrl: string;
 
   @Property('tags')
-  @Type(TagModel)
-  @Mock([])
-  tags: TagModel[];
+  @Type(BlogTagModel)
+  tags: BlogTagModel[];
 
   @Property('categories')
-  @Type(CategoryModel)
-  @Mock([])
-  categories: CategoryModel[];
+  @Type(BlogCategoryModel)
+  categories: BlogCategoryModel[];
 
   @Property('author')
+  @Type(AuthorModel)
   author: AuthorModel;
 
   @Property('createdAt')
@@ -167,30 +156,38 @@ export class BlogItemModel extends Model {
   @DefaultValue('')
   metaKeywords: string;
 
-  /** 便捷方法：是否已发布 */
-  isPublished() {
-    return this.status === 'published';
-  }
-
-  /** 便捷方法：摘要（截取 description 前 100 字） */
-  excerpt(len = 100) {
-    return this.description.length > len ? `${this.description.slice(0, len)}…` : this.description;
-  }
+  @Property('isPublished')
+  isPublished: boolean;
 }
 
 // ─── Comment ──────────────────────────────────────────────────────────────────
 
 export class CommentUserModel extends Model {
-  @Property('id') @DefaultValue('') id: string;
-  @Property('username') @DefaultValue('') username: string;
-  @Property('displayName') @DefaultValue('匿名') displayName: string;
-  @Property('photoURL') @DefaultValue('') photoURL: string;
+  @Property('id')
+  @DefaultValue('')
+  id: string;
+
+  @Property('username')
+  @DefaultValue('')
+  username: string;
+
+  @Property('displayName')
+  @DefaultValue('匿名')
+  displayName: string;
+
+  @Property('photoURL')
+  @DefaultValue('')
+  photoURL: string;
 }
 
 export class CommentModel extends Model {
-  @Property('id') @DefaultValue('') id: string;
+  @Property('id')
+  @DefaultValue('')
+  id: string;
 
-  @Property('content') @DefaultValue('') content: string;
+  @Property('content')
+  @DefaultValue('')
+  content: string;
 
   @Property('likes')
   @Transform(safeNumber)
@@ -201,9 +198,14 @@ export class CommentModel extends Model {
   parentId: string | null;
 
   @Property('user')
+  @Type(CommentUserModel)
   user: CommentUserModel;
 
   @Property('createdAt')
   @Transform(formatDate)
   createdAt: string;
+
+  @Property('replies')
+  @DefaultValue([])
+  replies: CommentModel[];
 }

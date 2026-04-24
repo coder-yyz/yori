@@ -1,7 +1,9 @@
+import useSWR from 'swr';
+
 import { useParams } from 'src/routes/hooks';
 
 import { CONFIG } from 'src/global-config';
-import { useGetBlog } from 'src/actions/blog';
+import { getBlog } from 'src/http';
 
 import { BlogDetailsHomeView } from './components/BlogDetailsHomeView';
 
@@ -12,19 +14,17 @@ const metadata = { title: `Blog details - ${CONFIG.appName}` };
 export default function Page() {
   const { id = '' } = useParams();
 
-  const { blog, isLoading, error } = useGetBlog(id);
-  // const { latestBlogs } = useGetLatestBlogs(title);
+  const { data, isLoading, error } = useSWR(id ? ['blog', id] : null, () => getBlog(id), {
+    revalidateIfStale: false,
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+  });
 
   return (
     <>
       <title>{metadata.title}</title>
 
-      <BlogDetailsHomeView
-        blog={blog}
-        // latestBlogs={latestBlogs}
-        loading={isLoading}
-        error={error}
-      />
+      <BlogDetailsHomeView blog={data} loading={isLoading} error={error} />
     </>
   );
 }

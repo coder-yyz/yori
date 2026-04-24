@@ -1,6 +1,7 @@
-import type { BlogItem } from 'src/types/blog';
+import type { BlogItemModel } from 'src/models';
 
 import { orderBy } from 'es-toolkit';
+import useSWR from 'swr';
 import { useState, useCallback } from 'react';
 
 import Box from '@mui/material/Box';
@@ -19,7 +20,7 @@ const BLOG_SORT_OPTIONS = [
   { value: 'popular', label: 'Popular' },
   { value: 'oldest', label: 'Oldest' },
 ];
-import { useGetMyBlogs, useGetAdminBlogs } from 'src/actions/blog';
+import { getAdminBlogs, getMyBlogs } from 'src/http';
 
 import { Label } from 'src/components/Label';
 import { Iconify } from 'src/components/Iconify';
@@ -49,10 +50,28 @@ export function BlogListView() {
     ...(publish !== 'all' ? { status: publish } : {}),
   };
 
-  const adminResult = useGetAdminBlogs(isAdmin ? queryParams : null);
-  const myResult = useGetMyBlogs(!isAdmin ? queryParams : null);
+  const swrOptions = {
+    revalidateIfStale: false,
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+  };
+  const swrKey1 = isAdmin ? ['adminBlogs', queryParams] : null;
+  const swrKey2 = !isAdmin ? ['myBlogs', queryParams] : null;
+  const { data: adminData, isLoading: adminLoading } = useSWR(
+    swrKey1,
+    () => getAdminBlogs(queryParams),
+    swrOptions
+  );
+  const { data: myData, isLoading: myLoading } = useSWR(
+    swrKey2,
+    () => getMyBlogs(queryParams),
+    swrOptions
+  );
 
-  const { blogs, blogsTotal, blogsLoading } = isAdmin ? adminResult : myResult;
+  const activeData = isAdmin ? adminData : myData;
+  const blogs = activeData?.list ?? [];
+  const blogsTotal = activeData?.total ?? 0;
+  const blogsLoading = isAdmin ? adminLoading : myLoading;
 
   const pageCount = Math.max(1, Math.ceil(blogsTotal / PAGE_SIZE));
 
@@ -143,7 +162,7 @@ export function BlogListView() {
 // ----------------------------------------------------------------------
 
 type ApplyFilterProps = {
-  inputData: BlogItem[];
+  inputData: BlogItemModel[];
   sortBy: string;
 };
 

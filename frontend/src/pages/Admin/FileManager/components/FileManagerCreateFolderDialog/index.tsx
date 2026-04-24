@@ -12,7 +12,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 
-import { uploadFile } from 'src/actions/blog';
+import { uploadFile } from 'src/http';
 
 import { Upload } from 'src/components/Upload';
 import { toast } from 'src/components/Snackbar';
@@ -62,14 +62,9 @@ export function FileManagerCreateFolderDialog({
     try {
       const fileObjects = files.filter((f): f is File => f instanceof File);
       await Promise.all(fileObjects.map((file) => uploadFile(file)));
-      await mutate(
-        (key: any) => {
-          const k = Array.isArray(key) ? key[0] : key;
-          return typeof k === 'string' && k.includes('/admin/uploads');
-        },
-        undefined,
-        { revalidate: true }
-      );
+      await mutate((key: any) => Array.isArray(key) && key[0] === 'adminUploads', undefined, {
+        revalidate: true,
+      });
       toast.success('Upload success!');
       setFiles([]);
       onClose();

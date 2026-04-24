@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import useSWR from 'swr';
 
 import Card from '@mui/material/Card';
 import Table from '@mui/material/Table';
@@ -19,7 +20,7 @@ import TablePagination from '@mui/material/TablePagination';
 import { paths } from 'src/routes/paths';
 
 import { DashboardContent } from 'src/layouts/dashboard';
-import { createCategory, updateCategory, deleteCategory, useGetCategories } from 'src/actions/blog';
+import { createCategory, updateCategory, deleteCategory, getCategories } from 'src/http';
 
 import { toast } from 'src/components/Snackbar';
 import { Iconify } from 'src/components/Iconify';
@@ -40,10 +41,18 @@ export function CategoryListView() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
-  const { categories, categoriesTotal, categoriesLoading } = useGetCategories({
-    page: page + 1,
-    pageSize: rowsPerPage,
+  const queryParams = { page: page + 1, pageSize: rowsPerPage };
+  const {
+    data,
+    isLoading: categoriesLoading,
+    mutate,
+  } = useSWR(['categories', queryParams], () => getCategories(queryParams), {
+    revalidateIfStale: false,
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
   });
+  const categories = data?.list ?? [];
+  const categoriesTotal = data?.total ?? 0;
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<{ id: string } | null>(null);
@@ -94,6 +103,7 @@ export function CategoryListView() {
         });
         toast.success('Category created!');
       }
+      mutate();
       handleClose();
     } catch (error: any) {
       toast.error(error?.message || 'Operation failed');
@@ -102,14 +112,18 @@ export function CategoryListView() {
     }
   };
 
-  const handleDelete = useCallback(async (id: string) => {
-    try {
-      await deleteCategory(id);
-      toast.success('Category deleted!');
-    } catch (error: any) {
-      toast.error(error?.message || 'Delete failed');
-    }
-  }, []);
+  const handleDelete = useCallback(
+    async (id: string) => {
+      try {
+        await deleteCategory(id);
+        toast.success('Category deleted!');
+        mutate();
+      } catch (error: any) {
+        toast.error(error?.message || 'Delete failed');
+      }
+    },
+    [mutate]
+  );
 
   return (
     <DashboardContent>

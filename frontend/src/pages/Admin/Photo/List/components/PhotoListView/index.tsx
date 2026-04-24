@@ -1,6 +1,7 @@
-import type { PhotoItem } from 'src/types/photo';
+import type { PhotoItemModel } from 'src/models';
 
 import { useState, useCallback } from 'react';
+import useSWR from 'swr';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -29,12 +30,12 @@ import { fDate } from 'src/utils/format-time';
 
 import { DashboardContent } from 'src/layouts/dashboard';
 import {
-  useGetAdminPhotos,
+  getAdminPhotos,
   adminUploadPhoto,
   adminUpdatePhoto,
   adminDeletePhoto,
-  useGetAdminPhotoTags,
-} from 'src/actions/photo';
+  getAdminPhotoTags,
+} from 'src/http';
 
 import { toast } from 'src/components/Snackbar';
 import { Iconify } from 'src/components/Iconify';
@@ -52,12 +53,25 @@ export function PhotoListView() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(12);
 
-  const { photos, photosTotal, photosLoading } = useGetAdminPhotos({
-    page: page + 1,
-    pageSize: rowsPerPage,
+  const photoParams = { page: page + 1, pageSize: rowsPerPage };
+  const {
+    data: photosData,
+    isLoading: photosLoading,
+    mutate: mutatePhotos,
+  } = useSWR(['adminPhotos', photoParams], () => getAdminPhotos(photoParams), {
+    revalidateIfStale: false,
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
   });
+  const photos = photosData?.list ?? [];
+  const photosTotal = photosData?.total ?? 0;
 
-  const { tags } = useGetAdminPhotoTags({ pageSize: 200 });
+  const { data: tagsData } = useSWR(
+    ['adminPhotoTags', { pageSize: 200 }],
+    () => getAdminPhotoTags({ pageSize: 200 }),
+    { revalidateIfStale: false, revalidateOnFocus: false, revalidateOnReconnect: false }
+  );
+  const tags = tagsData?.list ?? [];
 
   // Upload dialog
   const [uploadOpen, setUploadOpen] = useState(false);
@@ -69,7 +83,7 @@ export function PhotoListView() {
 
   // Edit dialog
   const [editOpen, setEditOpen] = useState(false);
-  const [editPhoto, setEditPhoto] = useState<PhotoItem | null>(null);
+  const [editPhoto, setEditPhoto] = useState<PhotoItemModel | null>(null);
   const [editTitle, setEditTitle] = useState('');
   const [editDesc, setEditDesc] = useState('');
   const [editTagIds, setEditTagIds] = useState<string[]>([]);
@@ -101,6 +115,7 @@ export function PhotoListView() {
         await adminUploadPhoto(formData);
       }
       toast.success(`${uploadFiles.length} 张照片上传成功`);
+      mutatePhotos();
       setUploadOpen(false);
     } catch (error: any) {
       toast.error(error?.message || '上传失败');
@@ -109,7 +124,7 @@ export function PhotoListView() {
     }
   };
 
-  const handleEditOpen = (photo: PhotoItem) => {
+  const handleEditOpen = (photo: PhotoItemModel) => {
     setEditPhoto(photo);
     setEditTitle(photo.title || '');
     setEditDesc(photo.description || '');
@@ -127,6 +142,7 @@ export function PhotoListView() {
         tagIds: editTagIds,
       });
       toast.success('更新成功');
+      mutatePhotos();
       setEditOpen(false);
     } catch (error: any) {
       toast.error(error?.message || '更新失败');
@@ -135,14 +151,18 @@ export function PhotoListView() {
     }
   };
 
-  const handleDelete = useCallback(async (id: string) => {
-    try {
-      await adminDeletePhoto(id);
-      toast.success('已删除');
-    } catch (error: any) {
-      toast.error(error?.message || '删除失败');
-    }
-  }, []);
+  const handleDelete = useCallback(
+    async (id: string) => {
+      try {
+        await adminDeletePhoto(id);
+        toast.success('已删除');
+        mutatePhotos();
+      } catch (error: any) {
+        toast.error(error?.message || '删除失败');
+      }
+    },
+    [mutatePhotos]
+  );
 
   const isImagePreviewable = (mimeType: string) =>
     mimeType?.startsWith('image/') && !mimeType.includes('tiff');

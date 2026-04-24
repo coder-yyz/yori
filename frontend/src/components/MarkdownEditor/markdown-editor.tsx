@@ -20,7 +20,7 @@ import ToggleButton from '@mui/material/ToggleButton';
 import FormHelperText from '@mui/material/FormHelperText';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 
-import { uploadFile } from 'src/actions/blog';
+import { uploadFile } from 'src/http';
 
 import { Iconify } from '../Iconify';
 import { EditorRoot } from '../Editor/styles';

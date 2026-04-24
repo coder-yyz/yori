@@ -1,9 +1,11 @@
+import useSWR from 'swr';
+
 import Button from '@mui/material/Button';
 
 import { paths } from 'src/routes/paths';
 import { RouterLink } from 'src/routes/components';
 
-import { useGetAdminUsers } from 'src/actions/user';
+import { getUsersList } from 'src/http';
 import { DashboardContent } from 'src/layouts/dashboard';
 
 import { Iconify } from 'src/components/Iconify';
@@ -14,7 +16,12 @@ import { UserCardList } from '../UserCardList';
 // ----------------------------------------------------------------------
 
 export function UserCardsView() {
-  const { users, usersLoading } = useGetAdminUsers();
+  const { data, isLoading: usersLoading } = useSWR('adminUsers', getUsersList, {
+    revalidateIfStale: false,
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+  });
+  const users = data?.list ?? [];
 
   return (
     <DashboardContent>
