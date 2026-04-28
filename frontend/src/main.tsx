@@ -1,7 +1,8 @@
+import 'reflect-metadata';
+
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Outlet, RouterProvider, createBrowserRouter } from 'react-router';
-import 'reflect-metadata';
 
 import { setEnv } from 'src/models';
 
@@ -10,7 +11,13 @@ import { routesSection } from './routes/sections';
 import { ErrorBoundary } from './routes/components';
 
 // 初始化 transform-model 环境（自动读取 import.meta.env.MODE）
-setEnv((import.meta.env.MODE === 'production' ? 'production' : import.meta.env.MODE === 'test' ? 'test' : 'development') as any);
+setEnv(
+  (import.meta.env.MODE === 'production'
+    ? 'production'
+    : import.meta.env.MODE === 'test'
+      ? 'test'
+      : 'development') as any
+);
 
 // ----------------------------------------------------------------------
 

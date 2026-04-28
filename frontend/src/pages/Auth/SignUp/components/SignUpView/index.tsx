@@ -18,7 +18,7 @@ import { RouterLink } from 'src/routes/components';
 import { Iconify } from 'src/components/Iconify';
 import { Form, Field, schemaUtils } from 'src/components/HookForm';
 
-import { signUp } from 'src/auth/context/jwt';
+import { signUp } from 'src/http';
 import { useAuthContext } from 'src/auth/hooks';
 import { getErrorMessage } from 'src/auth/utils';
 import { FormHead } from 'src/auth/components/form-head';

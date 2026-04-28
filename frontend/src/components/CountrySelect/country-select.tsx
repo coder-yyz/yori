@@ -1,20 +1,18 @@
-import type { ChipProps } from '@mui/material/Chip';
 import type { Theme, SxProps } from '@mui/material/styles';
-import type { TextFieldProps } from '@mui/material/TextField';
-import type {
-  AutocompleteProps,
-  AutocompleteRenderInputParams,
-  AutocompleteRenderValueGetItemProps,
-} from '@mui/material/Autocomplete';
 
 import { useId, useMemo, useCallback } from 'react';
 
-import Chip from '@mui/material/Chip';
-import TextField from '@mui/material/TextField';
+import Chip, { type ChipProps } from '@mui/material/Chip';
 import { filledInputClasses } from '@mui/material/FilledInput';
 import { outlinedInputClasses } from '@mui/material/OutlinedInput';
-import Autocomplete, { autocompleteClasses } from '@mui/material/Autocomplete';
+import TextField, { type TextFieldProps } from '@mui/material/TextField';
 import InputAdornment, { inputAdornmentClasses } from '@mui/material/InputAdornment';
+import Autocomplete, {
+  autocompleteClasses,
+  type AutocompleteProps,
+  type AutocompleteRenderInputParams,
+  type AutocompleteRenderValueGetItemProps,
+} from '@mui/material/Autocomplete';
 
 import { countries } from 'src/assets/data';
 

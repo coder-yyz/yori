@@ -1,6 +1,6 @@
-import type { Theme, Direction, CommonColors, ThemeProviderProps } from '@mui/material/styles';
 import type { ThemeCssVariables } from './types';
 import type { PaletteColorKey, PaletteColorNoChannels } from './core/palette';
+import type { Theme, Direction, CommonColors, ThemeProviderProps } from '@mui/material/styles';
 
 // ----------------------------------------------------------------------
 

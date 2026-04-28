@@ -21,7 +21,7 @@ import { Form, Field } from 'src/components/HookForm';
 import { useAuthContext } from 'src/auth/hooks';
 import { getErrorMessage } from 'src/auth/utils';
 import { FormHead } from 'src/auth/components/form-head';
-import { signInWithPassword } from 'src/auth/context/jwt';
+import { signInWithPassword } from 'src/http';
 
 // ----------------------------------------------------------------------
 

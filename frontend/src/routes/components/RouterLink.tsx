@@ -1,6 +1,4 @@
-import type { LinkProps } from 'react-router';
-
-import { Link } from 'react-router';
+import { Link, type LinkProps } from 'react-router';
 
 // ----------------------------------------------------------------------
 

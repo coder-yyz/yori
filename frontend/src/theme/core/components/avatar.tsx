@@ -1,12 +1,11 @@
 import type { AvatarGroupClassKey } from '@mui/material/AvatarGroup';
 import type { Theme, Components, ComponentsVariants } from '@mui/material/styles';
-import type { PaletteColorKey } from '../palette';
 
 import { parseCssVar } from 'minimal-shared/utils';
 
 import Box from '@mui/material/Box';
 
-import { colorKeys } from '../palette';
+import { colorKeys, type PaletteColorKey } from '../palette';
 
 // ----------------------------------------------------------------------
 

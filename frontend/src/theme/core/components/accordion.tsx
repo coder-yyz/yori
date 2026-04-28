@@ -1,13 +1,13 @@
-import type { BoxProps } from '@mui/material/Box';
-import type { SvgIconProps } from '@mui/material/SvgIcon';
-import type { AccordionSummaryClassKey } from '@mui/material/AccordionSummary';
 import type { Theme, CSSObject, Components, ComponentsVariants } from '@mui/material/styles';
 
-import Box from '@mui/material/Box';
-import SvgIcon from '@mui/material/SvgIcon';
+import Box, { type BoxProps } from '@mui/material/Box';
 import { accordionClasses } from '@mui/material/Accordion';
-import { accordionSummaryClasses } from '@mui/material/AccordionSummary';
+import SvgIcon, { type SvgIconProps } from '@mui/material/SvgIcon';
 import { accordionDetailsClasses } from '@mui/material/AccordionDetails';
+import {
+  accordionSummaryClasses,
+  type AccordionSummaryClassKey,
+} from '@mui/material/AccordionSummary';
 
 // ----------------------------------------------------------------------
 

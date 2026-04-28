@@ -10,6 +10,7 @@ import {
   BlogCategoryModel,
 } from 'src/models';
 
+import { setSession } from 'src/auth/context/jwt/utils';
 import { JWT_STORAGE_KEY } from 'src/auth/context/jwt/constant';
 
 // ----------------------------------------------------------------------
@@ -163,7 +164,10 @@ export async function getBlogs(params?: { page?: number; pageSize?: number }) {
     method: 'GET',
     params,
   });
-  return { list: createModel(BlogItemModel, res.data.data.list) as BlogItemModel[], total: res.data.data.total };
+  return {
+    list: createModel(BlogItemModel, res.data.data.list) as BlogItemModel[],
+    total: res.data.data.total,
+  };
 }
 
 export async function getAdminBlogs(params?: {
@@ -176,7 +180,10 @@ export async function getAdminBlogs(params?: {
     method: 'GET',
     params,
   });
-  return { list: createModel(BlogItemModel, res.data.data.list) as BlogItemModel[], total: res.data.data.total };
+  return {
+    list: createModel(BlogItemModel, res.data.data.list) as BlogItemModel[],
+    total: res.data.data.total,
+  };
 }
 
 export async function getMyBlogs(params?: { page?: number; pageSize?: number; status?: string }) {
@@ -185,7 +192,10 @@ export async function getMyBlogs(params?: { page?: number; pageSize?: number; st
     method: 'GET',
     params,
   });
-  return { list: createModel(BlogItemModel, res.data.data.list) as BlogItemModel[], total: res.data.data.total };
+  return {
+    list: createModel(BlogItemModel, res.data.data.list) as BlogItemModel[],
+    total: res.data.data.total,
+  };
 }
 
 export async function getBlog(id: string) {
@@ -308,7 +318,10 @@ export async function getTags(params?: { page?: number; pageSize?: number; searc
     method: 'GET',
     params,
   });
-  return { list: createModel(BlogTagModel, res.data.data.list) as BlogTagModel[], total: res.data.data.total };
+  return {
+    list: createModel(BlogTagModel, res.data.data.list) as BlogTagModel[],
+    total: res.data.data.total,
+  };
 }
 
 export async function createTag(name: string) {
@@ -355,7 +368,10 @@ export async function getCategories(params?: { page?: number; pageSize?: number 
     method: 'GET',
     params,
   });
-  return { list: createModel(BlogCategoryModel, res.data.data.list) as BlogCategoryModel[], total: res.data.data.total };
+  return {
+    list: createModel(BlogCategoryModel, res.data.data.list) as BlogCategoryModel[],
+    total: res.data.data.total,
+  };
 }
 
 export async function createCategory(data: {
@@ -409,7 +425,10 @@ export async function getComments(blogId: string, params?: { page?: number; page
     method: 'GET',
     params,
   });
-  return { list: createModel(CommentModel, res.data.data.list) as CommentModel[], total: res.data.data.total };
+  return {
+    list: createModel(CommentModel, res.data.data.list) as CommentModel[],
+    total: res.data.data.total,
+  };
 }
 
 export async function createComment(data: { blogId: string; content: string; parentId?: string }) {
@@ -477,7 +496,10 @@ export async function getAdminPhotos(params?: { page?: number; pageSize?: number
     method: 'GET',
     params,
   });
-  return { list: createModel(PhotoItemModel, res.data.data.list) as PhotoItemModel[], total: res.data.data.total };
+  return {
+    list: createModel(PhotoItemModel, res.data.data.list) as PhotoItemModel[],
+    total: res.data.data.total,
+  };
 }
 
 export async function adminUploadPhoto(formData: FormData) {
@@ -520,7 +542,10 @@ export async function getAdminPhotoTags(params?: {
     method: 'GET',
     params,
   });
-  return { list: createModel(PhotoTagModel, res.data.data.list) as PhotoTagModel[], total: res.data.data.total };
+  return {
+    list: createModel(PhotoTagModel, res.data.data.list) as PhotoTagModel[],
+    total: res.data.data.total,
+  };
 }
 
 export async function createPhotoTag(data: { name: string }) {
@@ -671,3 +696,78 @@ export async function deleteFile(id: string) {
 // Aliases
 export const adminDeleteUpload = deleteFile;
 
+// ======================================================================
+// Auth
+// ======================================================================
+
+export type SignInParams = {
+  account: string;
+  password: string;
+};
+
+export type SignUpParams = {
+  username: string;
+  email: string;
+  password: string;
+  displayName: string;
+};
+
+/** Sign in with account & password */
+export async function signInWithPassword({ account, password }: SignInParams): Promise<void> {
+  try {
+    const res = await axiosInstance.post(endpoints.auth.signIn, { account, password });
+
+    const accessToken = res.data?.data?.token;
+    if (!accessToken) {
+      throw new Error('Access token not found in response');
+    }
+
+    setSession(accessToken);
+  } catch (error) {
+    console.error('Error during sign in:', error);
+    throw error;
+  }
+}
+
+/** Sign up a new user */
+export async function signUp({
+  username,
+  email,
+  password,
+  displayName,
+}: SignUpParams): Promise<void> {
+  try {
+    const res = await axiosInstance.post(endpoints.auth.signUp, {
+      username,
+      email,
+      password,
+      displayName,
+    });
+
+    const accessToken = res.data?.data?.token;
+    if (!accessToken) {
+      throw new Error('Access token not found in response');
+    }
+
+    setSession(accessToken);
+  } catch (error) {
+    console.error('Error during sign up:', error);
+    throw error;
+  }
+}
+
+/** Sign out and clear session */
+export async function signOut(): Promise<void> {
+  try {
+    await setSession(null);
+  } catch (error) {
+    console.error('Error during sign out:', error);
+    throw error;
+  }
+}
+
+/** Fetch current authenticated user */
+export async function getMe<T = any>(): Promise<T> {
+  const res = await axiosInstance.get(endpoints.auth.me);
+  return res.data?.data as T;
+}

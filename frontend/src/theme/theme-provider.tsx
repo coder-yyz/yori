@@ -1,9 +1,12 @@
-import type { Theme, ThemeProviderProps as MuiThemeProviderProps } from '@mui/material/styles';
 import type {} from './extend-theme-types';
 import type { ThemeOptions } from './types';
 
 import CssBaseline from '@mui/material/CssBaseline';
-import { ThemeProvider as ThemeVarsProvider } from '@mui/material/styles';
+import {
+  type Theme,
+  ThemeProvider as ThemeVarsProvider,
+  type ThemeProviderProps as MuiThemeProviderProps,
+} from '@mui/material/styles';
 
 import { useTranslate } from 'src/locales';
 

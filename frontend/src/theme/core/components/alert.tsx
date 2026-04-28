@@ -1,9 +1,8 @@
-import type { SvgIconProps } from '@mui/material/SvgIcon';
 import type { Theme, Components, ComponentsVariants } from '@mui/material/styles';
 
 import { varAlpha, parseCssVar } from 'minimal-shared/utils';
 
-import SvgIcon from '@mui/material/SvgIcon';
+import SvgIcon, { type SvgIconProps } from '@mui/material/SvgIcon';
 
 // ----------------------------------------------------------------------
 

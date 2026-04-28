@@ -1,8 +1,7 @@
-import type { Theme, Components } from '@mui/material/styles';
 import type { ThemeOptions } from './types';
 import type { SettingsState } from 'src/components/Settings';
 
-import { createTheme as createMuiTheme } from '@mui/material/styles';
+import { type Theme, type Components, createTheme as createMuiTheme } from '@mui/material/styles';
 
 import { mixins } from './core/mixins';
 import { opacity } from './core/opacity';

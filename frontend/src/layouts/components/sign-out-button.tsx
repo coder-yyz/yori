@@ -8,8 +8,8 @@ import { useRouter } from 'src/routes/hooks';
 
 import { toast } from 'src/components/Snackbar';
 
+import { signOut as jwtSignOut } from 'src/http';
 import { useAuthContext } from 'src/auth/hooks';
-import { signOut as jwtSignOut } from 'src/auth/context/jwt/action';
 // ----------------------------------------------------------------------
 
 const signOut = jwtSignOut;

@@ -1,12 +1,12 @@
-import type {} from '@mui/lab/themeAugmentation';
-import type {} from '@mui/x-tree-view/themeAugmentation';
-import type {} from '@mui/x-data-grid/themeAugmentation';
-import type {} from '@mui/x-date-pickers/themeAugmentation';
-import type {} from '@mui/material/themeCssVarsAugmentation';
 import type { DeepPartial } from './types';
+import type {} from '@mui/lab/themeAugmentation';
 import type { MixinsExtend } from './core/mixins';
 import type { OpacityExtend } from './core/opacity';
+import type {} from '@mui/x-tree-view/themeAugmentation';
+import type {} from '@mui/x-data-grid/themeAugmentation';
 import type { CustomShadows } from './core/custom-shadows';
+import type {} from '@mui/x-date-pickers/themeAugmentation';
+import type {} from '@mui/material/themeCssVarsAugmentation';
 import type { RatingExtendSize } from './core/components/rating';
 import type { TypographyVariantsExtend } from './core/typography';
 import type { SliderExtendColor } from './core/components/slider';

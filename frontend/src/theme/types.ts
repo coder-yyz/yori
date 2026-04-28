@@ -1,3 +1,4 @@
+import type { CustomShadows } from './core/custom-shadows';
 import type {
   Theme,
   Shadows,
@@ -7,7 +8,6 @@ import type {
   SupportedColorScheme,
   ThemeOptions as MuiThemeOptions,
 } from '@mui/material/styles';
-import type { CustomShadows } from './core/custom-shadows';
 
 // ----------------------------------------------------------------------
 

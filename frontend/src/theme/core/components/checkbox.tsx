@@ -1,8 +1,6 @@
-import type { SvgIconProps } from '@mui/material/SvgIcon';
-import type { Theme, Components } from '@mui/material/styles';
-
-import SvgIcon from '@mui/material/SvgIcon';
 import { checkboxClasses } from '@mui/material/Checkbox';
+import { type Theme, type Components } from '@mui/material/styles';
+import SvgIcon, { type SvgIconProps } from '@mui/material/SvgIcon';
 
 // ----------------------------------------------------------------------
 
