@@ -82,29 +82,8 @@ function getVendorChunk(id: string) {
     return 'vendor-i18n';
   }
 
-  if (id.includes('/maplibre-gl/') || id.includes('/react-map-gl/')) {
-    return 'vendor-map';
-  }
-
   if (id.includes('/dayjs/') || id.includes('/axios/') || id.includes('/swr/')) {
     return 'vendor-data';
-  }
-
-  if (id.includes('/firebase/') || id.includes('/aws-amplify/') || id.includes('/@supabase/')) {
-    return 'vendor-cloud';
-  }
-
-  if (
-    id.includes('/@firebase/') ||
-    id.includes('/@aws-') ||
-    id.includes('/@smithy/') ||
-    id.includes('/amazon-cognito-')
-  ) {
-    return 'vendor-cloud-sdk';
-  }
-
-  if (id.includes('/@fullcalendar/')) {
-    return 'vendor-calendar';
   }
 
   if (
@@ -122,9 +101,6 @@ function getVendorChunk(id: string) {
   const pkg = getPackageName(id);
   if (!pkg) return undefined;
 
-  if (pkg.startsWith('@atlaskit/')) return 'vendor-atlaskit';
-  if (pkg.startsWith('@react-pdf/')) return 'vendor-pdf';
-  if (pkg.startsWith('@auth0/')) return 'vendor-auth';
   if (pkg === 'framer-motion') return 'vendor-motion';
 
   return undefined;
