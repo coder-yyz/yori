@@ -3,8 +3,6 @@ import { useMemo, useCallback } from 'react';
 import { isEqualPath } from 'minimal-shared/utils';
 import { useNavigate, type NavigateOptions } from 'react-router';
 
-// ----------------------------------------------------------------------
-
 /**
  * Customized useRouter hook with NProgress integration.
  */

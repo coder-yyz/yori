@@ -17,14 +17,6 @@ const Page404 = lazy(() => import('src/pages/Error404'));
 export const routesSection: RouteObject[] = [
   {
     path: '/',
-    /**
-     * @skip homepage
-     * import { Navigate } from "react-router";
-     * import { CONFIG } from 'src/global-config';
-     *
-     * element: <Navigate to={CONFIG.auth.redirectPath} replace />,
-     * and remove the element below:
-     */
     element: (
       <Suspense fallback={<SplashScreen />}>
         <MainLayout>

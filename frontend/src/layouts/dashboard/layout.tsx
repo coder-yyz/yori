@@ -9,8 +9,6 @@ import Alert from '@mui/material/Alert';
 import { iconButtonClasses } from '@mui/material/IconButton';
 import { useTheme, type Breakpoint } from '@mui/material/styles';
 
-import { allLangs } from 'src/locales';
-
 import { Logo } from 'src/components/Logo';
 import { useSettingsContext } from 'src/components/Settings';
 
@@ -25,7 +23,6 @@ import { Searchbar } from '../components/searchbar';
 import { MenuButton } from '../components/menu-button';
 import { AccountDrawer } from '../components/account-drawer';
 import { SettingsButton } from '../components/settings-button';
-import { LanguagePopover } from '../components/language-popover';
 import { navData as dashboardNavData } from '../nav-config-dashboard';
 import { dashboardLayoutVars, dashboardNavColorVars } from './css-vars';
 import {
@@ -143,9 +140,6 @@ export function DashboardLayout({
         <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0, sm: 0.75 } }}>
           {/** @slot Searchbar */}
           <Searchbar data={navData} />
-
-          {/** @slot Language popover */}
-          <LanguagePopover data={allLangs} />
 
           {/** @slot Settings button */}
           <SettingsButton />

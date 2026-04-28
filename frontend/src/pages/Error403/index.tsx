@@ -1,17 +1,47 @@
-import { CONFIG } from 'src/global-config';
+import { m } from 'framer-motion';
 
-import { View403 } from './components/View403';
+import Button from '@mui/material/Button';
+import Container from '@mui/material/Container';
+import Typography from '@mui/material/Typography';
+
+import { RouterLink } from 'src/routes/components';
+
+import { ForbiddenIllustration } from 'src/assets/illustrations';
+
+import { SimpleLayout } from 'src/layouts/simple';
+import { varBounce, MotionContainer } from 'src/components/Animate';
 
 // ----------------------------------------------------------------------
 
-const metadata = { title: `403 forbidden! | Error - ${CONFIG.appName}` };
-
-export default function Page() {
+export default function View403() {
   return (
-    <>
-      <title>{metadata.title}</title>
+    <SimpleLayout
+      slotProps={{
+        content: { compact: true },
+      }}
+    >
+      <Container component={MotionContainer}>
+        <m.div variants={varBounce('in')}>
+          <Typography variant="h3" sx={{ mb: 2 }}>
+            No permission
+          </Typography>
+        </m.div>
 
-      <View403 />
-    </>
+        <m.div variants={varBounce('in')}>
+          <Typography sx={{ color: 'text.secondary' }}>
+            The page you’re trying to access has restricted access. Please refer to your system
+            administrator.
+          </Typography>
+        </m.div>
+
+        <m.div variants={varBounce('in')}>
+          <ForbiddenIllustration sx={{ my: { xs: 5, sm: 10 } }} />
+        </m.div>
+
+        <Button component={RouterLink} href="/" size="large" variant="contained">
+          Go to home
+        </Button>
+      </Container>
+    </SimpleLayout>
   );
 }

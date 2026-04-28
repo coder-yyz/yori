@@ -1,10 +1,7 @@
-import type { RouteObject } from 'react-router';
-
-import { Outlet } from 'react-router';
 import { lazy, Suspense } from 'react';
+import { Outlet, type RouteObject } from 'react-router';
 
 import { DashboardLayout } from 'src/layouts/dashboard';
-
 import { LoadingScreen } from 'src/components/LoadingScreen';
 import { AccountLayout } from 'src/components/AccountLayout';
 

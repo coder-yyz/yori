@@ -1,10 +1,7 @@
-import type { RouteObject } from 'react-router';
-
-import { Outlet } from 'react-router';
 import { lazy, Suspense } from 'react';
+import { Outlet, type RouteObject } from 'react-router';
 
 import { AuthSplitLayout } from 'src/layouts/auth-split';
-
 import { SplashScreen } from 'src/components/LoadingScreen';
 
 import { GuestGuard } from 'src/auth/guard';
