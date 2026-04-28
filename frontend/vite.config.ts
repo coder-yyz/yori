@@ -1,6 +1,7 @@
 import path from 'path';
 import checker from 'vite-plugin-checker';
 import { defineConfig } from 'vite';
+import { compression } from 'vite-plugin-compression2';
 import react from '@vitejs/plugin-react-swc';
 
 // ----------------------------------------------------------------------
@@ -145,6 +146,18 @@ export default defineConfig({
         position: 'tl',
         initialIsOpen: false,
       },
+    }),
+    // Precompress assets at build time so nginx can serve .gz / .br sidecars
+    // (no CPU cost at request time; smaller payload over slow networks).
+    compression({
+      algorithm: 'gzip',
+      threshold: 1024,
+      exclude: [/\.(br|gz)$/],
+    }),
+    compression({
+      algorithm: 'brotliCompress',
+      threshold: 1024,
+      exclude: [/\.(br|gz)$/],
     }),
   ],
   resolve: {
