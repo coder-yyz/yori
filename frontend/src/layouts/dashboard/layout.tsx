@@ -1,6 +1,4 @@
-import type { Breakpoint } from '@mui/material/styles';
 import type { NavItemProps, NavSectionProps } from 'src/components/NavSection';
-import type { MainSectionProps, HeaderSectionProps, LayoutSectionProps } from '../core';
 
 import { merge } from 'es-toolkit';
 import { useBoolean } from 'minimal-shared/hooks';
@@ -8,8 +6,8 @@ import { useBoolean } from 'minimal-shared/hooks';
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
 import Alert from '@mui/material/Alert';
-import { useTheme } from '@mui/material/styles';
 import { iconButtonClasses } from '@mui/material/IconButton';
+import { useTheme, type Breakpoint } from '@mui/material/styles';
 
 import { allLangs } from 'src/locales';
 
@@ -24,15 +22,21 @@ import { NavVertical } from './nav-vertical';
 import { NavHorizontal } from './nav-horizontal';
 import { _account } from '../nav-config-account';
 import { Searchbar } from '../components/searchbar';
-import { _workspaces } from '../nav-config-workspace';
 import { MenuButton } from '../components/menu-button';
 import { AccountDrawer } from '../components/account-drawer';
 import { SettingsButton } from '../components/settings-button';
 import { LanguagePopover } from '../components/language-popover';
-import { WorkspacesPopover } from '../components/workspaces-popover';
 import { navData as dashboardNavData } from '../nav-config-dashboard';
 import { dashboardLayoutVars, dashboardNavColorVars } from './css-vars';
-import { MainSection, layoutClasses, HeaderSection, LayoutSection } from '../core';
+import {
+  MainSection,
+  layoutClasses,
+  HeaderSection,
+  LayoutSection,
+  type MainSectionProps,
+  type HeaderSectionProps,
+  type LayoutSectionProps,
+} from '../core';
 
 // ----------------------------------------------------------------------
 
@@ -133,12 +137,6 @@ export function DashboardLayout({
           {isNavHorizontal && (
             <VerticalDivider sx={{ [theme.breakpoints.up(layoutQuery)]: { display: 'flex' } }} />
           )}
-
-          {/** @slot Workspace popover */}
-          {/* <WorkspacesPopover
-            data={_workspaces}
-            sx={{ ...(isNavHorizontal && { color: 'var(--layout-nav-text-primary-color)' }) }}
-          /> */}
         </>
       ),
       rightArea: (

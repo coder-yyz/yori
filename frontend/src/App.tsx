@@ -3,14 +3,17 @@ import 'src/global.css';
 import { lazy, Suspense, useEffect } from 'react';
 
 import { usePathname } from 'src/routes/hooks';
-import { Snackbar } from 'src/components/Snackbar';
+
 import { LocalizationProvider } from 'src/locales';
 import { themeConfig, ThemeProvider } from 'src/theme';
-import { ProgressBar } from 'src/components/ProgressBar';
 import { I18nProvider } from 'src/locales/i18n-provider';
+
+import { Snackbar } from 'src/components/Snackbar';
+import { ProgressBar } from 'src/components/ProgressBar';
 import { MotionLazy } from 'src/components/Animate/motion-lazy';
-import { AuthProvider as JwtAuthProvider } from 'src/auth/context/jwt';
 import { defaultSettings, SettingsProvider } from 'src/components/Settings';
+
+import { AuthProvider as JwtAuthProvider } from 'src/auth/context/jwt';
 
 const SettingsDrawer = lazy(() =>
   import('src/components/Settings/drawer/settings-drawer').then((m) => ({

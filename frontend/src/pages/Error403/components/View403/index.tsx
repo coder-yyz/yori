@@ -6,9 +6,9 @@ import Typography from '@mui/material/Typography';
 
 import { RouterLink } from 'src/routes/components';
 
-import { SimpleLayout } from 'src/layouts/simple';
 import { ForbiddenIllustration } from 'src/assets/illustrations';
 
+import { SimpleLayout } from 'src/layouts/simple';
 import { varBounce, MotionContainer } from 'src/components/Animate';
 
 // ----------------------------------------------------------------------
